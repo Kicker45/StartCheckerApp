@@ -32,6 +32,13 @@
                             Clicked="OnLoadStartListClicked"/>
                 </StackLayout>
             </Grid>
+            <Grid Row="1" Padding="10">
+                <Button Text="Načíst startovní listinu"
+        Clicked="OnNavigateToGetStartlist" />
+                <Button Text="Seznam závodníků"
+        Clicked="OnNavigateToFullList" />
+            </Grid>
+
         </Grid>
     </Grid>
 </ContentPage>

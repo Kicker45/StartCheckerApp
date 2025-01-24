@@ -8,6 +8,15 @@ namespace StartCheckerApp
         {
             InitializeComponent();
         }
+        private async void OnNavigateToGetStartlist(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new GetStartlistPage());
+        }
+
+        private async void OnNavigateToFullList(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new FullListPage());
+        }
 
         private void OnLoadStartListClicked(object sender, EventArgs e)
         {
