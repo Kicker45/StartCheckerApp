@@ -1,10 +1,5 @@
-using System;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
 using StartCheckerApp.Models;
-using StartCheckerApp;
 
 namespace StartCheckerApp.Views
 {
@@ -54,10 +49,12 @@ namespace StartCheckerApp.Views
                     var raceData = JsonSerializer.Deserialize<RaceData>(responseData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (raceData.StartList.Count > 0) //ve startovce jsou závodníci ke zobrazení
                     {
-                        _raceDataService.SetRunners(raceData.StartList); // Uložíme seznam závodníkù pøes službu 
-                        _raceDataService.SetRunners(raceData.StartList);
-                        await Navigation.PushAsync(new FullListPage(_raceDataService));
+                        LoadingIndicator.IsRunning = false;
+                        LoadingIndicator.IsVisible = false;
                         await DisplayAlert("Úspìch", $"Závod: {raceData.RaceName}, Poèet závodníkù: {raceData.StartList.Count}", "OK");
+                        await Navigation.PopAsync();
+                        _raceDataService.SetRace(raceData.RaceId, raceData.StartList);// Uložíme seznam závodníkù pøes službu 
+                        await Navigation.PushAsync(new FullListPage(_raceDataService, _httpClient));
                     }
                     else { await DisplayAlert("Chyba", $"Závod ({raceData.RaceName}) nemá žádné závodníky k zobrazení", "OK"); }
                 }

@@ -10,6 +10,7 @@
             InitializeComponent();
             _serviceProvider = serviceProvider;
             _raceDataService = raceDataService;
+            
         }
 
         private async void OnNavigateToGetStartlist(object sender, EventArgs e)
@@ -25,8 +26,8 @@
                 await DisplayAlert("Chyba", "Nejdříve načti startovní listinu.", "OK");
                 return;
             }
-
-            await Navigation.PushAsync(new FullListPage(_raceDataService));
+            var fullListPage = _serviceProvider.GetRequiredService<FullListPage>();
+            await Navigation.PushAsync(fullListPage);
         }
 
 

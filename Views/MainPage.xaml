@@ -2,13 +2,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StartCheckerApp.Views.MainPage"
-             BackgroundColor="White">
+             Title="StartChecker"
+             
+             BackgroundColor="white">
 
     <Grid>
         <!-- Horní část s názvem a indikátory -->
         <Grid RowDefinitions="Auto,*">
             <!-- Horní menu -->
-            <Grid BackgroundColor="#2196F3" Padding="10" Row="0">
+            <Grid BackgroundColor="DarkOrange" Padding="10" Row="0">
                 <Label Text="StartChecker"
                        TextColor="White"
                        FontSize="24"

@@ -43,6 +43,7 @@ namespace StartCheckerApp
             // Přidání služby pro správu startovky
             builder.Services.AddSingleton<RaceDataService>();
 
+
             // Přidání toolkit pro správné fungování popup oken
             builder.UseMauiApp<App>().UseMauiCommunityToolkit();
 

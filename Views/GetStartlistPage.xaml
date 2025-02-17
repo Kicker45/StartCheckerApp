@@ -4,7 +4,7 @@
              x:Class="StartCheckerApp.Views.GetStartlistPage"
              Title="Načíst startovní listinu">
 
-    <StackLayout Padding="20" Spacing="15">
+    <StackLayout Padding="20" Spacing="0">
         <Label Text="Zadejte kód závodu:"
                FontSize="18"
                HorizontalOptions="Center"/>

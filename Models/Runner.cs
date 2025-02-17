@@ -17,6 +17,9 @@ namespace StartCheckerApp.Models
         [JsonPropertyName("surname")]
         public string Surname { get; set; }
 
+        [JsonPropertyName("category")]
+        public string Category { get; set; }
+
         [JsonPropertyName("siNumber")]
         public int SINumber { get; set; }
 
@@ -25,9 +28,6 @@ namespace StartCheckerApp.Models
 
         [JsonPropertyName("startPassage")]
         public DateTime? StartPassage { get; set; }
-
-        [JsonPropertyName("category")]
-        public string Category { get; set; }
 
         [JsonPropertyName("status")]
         public string Status { get; set; }
