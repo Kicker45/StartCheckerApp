@@ -52,6 +52,16 @@ namespace StartCheckerApp.Views
             ((CollectionView)sender).SelectedItem = null;
         }
 
+        private async void OnEditRunnerClicked(object sender, EventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.BindingContext is Runner selectedRunner)
+            {
+                await HandleRunnerPopup(selectedRunner);
+            }
+        }
+
+
         private async void OnAddRunnerClicked(object sender, EventArgs e)
         {
             var newRunner = new Runner

@@ -34,5 +34,7 @@ namespace StartCheckerApp.Models
 
         [JsonPropertyName("raceId")]
         public int RaceId { get; set; }
+        public string FullName => $"{FirstName} {Surname}";
+
     }
 }
