@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using StartCheckerApp.Views;
 
 namespace StartCheckerApp
 {
@@ -21,6 +22,22 @@ namespace StartCheckerApp
             builder.Services.AddTransient<FullListPage>();
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<CurrentMinutePage>();
+
+            // Přidání http clienta
+            var clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+
+            builder.Services.AddSingleton(sp =>
+            {
+                return new HttpClient
+                {
+                    BaseAddress = new Uri("http://10.0.2.2:32769/api/StartList/"),
+                    Timeout = TimeSpan.FromSeconds(10),
+                    DefaultRequestHeaders = { Connection = { "keep-alive" } }
+                };
+            });
+
+
 
 #if DEBUG
             builder.Logging.AddDebug();

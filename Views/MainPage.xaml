@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StartCheckerApp.MainPage"
+             x:Class="StartCheckerApp.Views.MainPage"
              BackgroundColor="White">
 
     <Grid>
@@ -24,21 +24,22 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"/>
 
-                    <Button Text="Načíst startovní listinu"
-                            BackgroundColor="#4CAF50"
-                            TextColor="White"
-                            FontSize="16"
-                            Margin="0,20,0,0"
-                            Clicked="OnLoadStartListClicked"/>
+                    <StackLayout Padding="20" Spacing="15">
+                        <Button Text="Načíst startovní listinu"
+            Clicked="OnNavigateToGetStartlist"/>
+
+                        <Button Text="Seznam závodníků"
+            Clicked="OnNavigateToFullList"/>
+
+                        <Button Text="Aktuální startovní minuta"
+            Clicked="OnNavigateToCurrentMinute"/>
+
+                        <Button Text="Nastavení"
+            Clicked="OnNavigateToSettings"/>
+                    </StackLayout>
+
                 </StackLayout>
             </Grid>
-            <Grid Row="1" Padding="10">
-                <Button Text="Načíst startovní listinu"
-        Clicked="OnNavigateToGetStartlist" />
-                <Button Text="Seznam závodníků"
-        Clicked="OnNavigateToFullList" />
-            </Grid>
-
         </Grid>
     </Grid>
 </ContentPage>

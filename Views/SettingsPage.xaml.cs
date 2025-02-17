@@ -1,4 +1,5 @@
-namespace StartCheckerApp;
+
+namespace StartCheckerApp.Views;
 
 public partial class SettingsPage : ContentPage
 {

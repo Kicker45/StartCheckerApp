@@ -1,4 +1,6 @@
-﻿namespace StartCheckerApp
+﻿using StartCheckerApp.Views;
+
+namespace StartCheckerApp
 {
     public partial class App : Application
     {

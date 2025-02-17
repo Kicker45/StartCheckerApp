@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StartCheckerApp.Views.GetStartlistPage"
+             Title="Načíst startovní listinu">
+
+    <StackLayout Padding="20" Spacing="15">
+        <Label Text="Zadejte kód závodu:"
+               FontSize="18"
+               HorizontalOptions="Center"/>
+
+        <Entry Placeholder="Kód závodu"
+               x:Name="RaceCodeEntry"
+               FontSize="16"
+               HorizontalOptions="Fill"/>
+
+        <Button Text="Načíst"
+                BackgroundColor="#4CAF50"
+                TextColor="White"
+                FontSize="16"
+                Clicked="OnLoadStartListClicked"/>
+
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           IsRunning="False"
+                           IsVisible="False"/>
+    </StackLayout>
+
+</ContentPage>

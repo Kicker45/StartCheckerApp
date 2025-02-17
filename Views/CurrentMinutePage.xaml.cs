@@ -1,4 +1,4 @@
-namespace StartCheckerApp;
+namespace StartCheckerApp.Views;
 
 public partial class CurrentMinutePage : ContentPage
 {
