@@ -11,11 +11,13 @@ namespace StartCheckerApp.Views
     public partial class GetStartlistPage : ContentPage
     {
         private readonly HttpClient _httpClient;
+        private readonly RaceDataService _raceDataService;
 
-        public GetStartlistPage(HttpClient httpClient)
+        public GetStartlistPage(HttpClient httpClient, RaceDataService raceDataService)
         {
             InitializeComponent();
             _httpClient = httpClient;
+            _raceDataService = raceDataService;
         }
 
         private async void OnLoadStartListClicked(object sender, EventArgs e)
@@ -31,23 +33,33 @@ namespace StartCheckerApp.Views
             LoadingIndicator.IsVisible = true;
             LoadingIndicator.IsRunning = true;
 
+            
             try
             {
+                //Console.WriteLine($"Requesting: {_httpClient.BaseAddress}{url}");
                 string url = $"get-startlist?raceId={raceId}";
-                Console.WriteLine($"Requesting: {_httpClient.BaseAddress}{url}");
+                //Console.WriteLine($"RestURL: {Constants.RestUrl}");
+                //Console.WriteLine($"Requesting: {url}");
+
 
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
 
-                Console.WriteLine($"Response status: {response.StatusCode}");
+                //Console.WriteLine($"Response status: {response.StatusCode}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     string responseData = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Server response: {responseData}");
+                    //Console.WriteLine($"Server response: {responseData}");
                 
-                var raceData = JsonSerializer.Deserialize<RaceData>(responseData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                    await DisplayAlert("Úspìch", $"Závod: {raceData.RaceName}, Poèet závodníkù: {raceData.StartList.Count}", "OK");
+                    var raceData = JsonSerializer.Deserialize<RaceData>(responseData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (raceData.StartList.Count > 0) //ve startovce jsou závodníci ke zobrazení
+                    {
+                        _raceDataService.SetRunners(raceData.StartList); // Uložíme seznam závodníkù pøes službu 
+                        _raceDataService.SetRunners(raceData.StartList);
+                        await Navigation.PushAsync(new FullListPage(_raceDataService));
+                        await DisplayAlert("Úspìch", $"Závod: {raceData.RaceName}, Poèet závodníkù: {raceData.StartList.Count}", "OK");
+                    }
+                    else { await DisplayAlert("Chyba", $"Závod ({raceData.RaceName}) nemá žádné závodníky k zobrazení", "OK"); }
                 }
                 else
                 {

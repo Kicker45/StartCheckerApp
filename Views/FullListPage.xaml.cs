@@ -1,16 +1,46 @@
-using System;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
 using StartCheckerApp.Models;
-using StartCheckerApp;
-namespace StartCheckerApp.Views;
+using CommunityToolkit.Maui.Views;
+using Microsoft.Maui.Controls;
+using System.Collections.Generic;
 
-public partial class FullListPage : ContentPage
+namespace StartCheckerApp.Views
 {
-	public FullListPage()
-	{
-		InitializeComponent();
-	}
+    public partial class FullListPage : ContentPage
+    {
+        private readonly RaceDataService _raceDataService;
+
+        public FullListPage(RaceDataService raceDataService)
+        {
+            InitializeComponent();
+            _raceDataService = raceDataService;
+
+            // Naètení závodníkù ze služby
+            RunnersList.ItemsSource = _raceDataService.Runners;
+        }
+
+        private async void OnRunnerSelected(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection.Count == 0)
+                return;
+
+            var selectedRunner = (Runner)e.CurrentSelection.FirstOrDefault();
+            if (selectedRunner != null)
+            {
+                var popup = new RunnerDetailPopup(selectedRunner);
+                var updatedRunner = await this.ShowPopupAsync(popup) as Runner;
+
+                if (updatedRunner != null)
+                {
+                    // Aktualizace dat v RaceDataService
+                    _raceDataService.UpdateRunner(updatedRunner);
+
+                    // Aktualizace UI
+                    RunnersList.ItemsSource = null;
+                    RunnersList.ItemsSource = _raceDataService.Runners;
+                }
+            }
+
+            ((CollectionView)sender).SelectedItem = null; // Zruší výbìr po kliknutí
+        }
+    }
 }

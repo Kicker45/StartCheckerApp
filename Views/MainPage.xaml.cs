@@ -1,22 +1,15 @@
-﻿using Microsoft.Maui.Controls;
-using System;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using StartCheckerApp.Models;
-using StartCheckerApp;
-
-namespace StartCheckerApp.Views
+﻿namespace StartCheckerApp.Views
 {
     public partial class MainPage : ContentPage
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly RaceDataService _raceDataService;
 
-        public MainPage(IServiceProvider serviceProvider)
+        public MainPage(IServiceProvider serviceProvider, RaceDataService raceDataService)
         {
             InitializeComponent();
             _serviceProvider = serviceProvider;
+            _raceDataService = raceDataService;
         }
 
         private async void OnNavigateToGetStartlist(object sender, EventArgs e)
@@ -27,8 +20,15 @@ namespace StartCheckerApp.Views
 
         private async void OnNavigateToFullList(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new FullListPage());
+            if (_raceDataService.Runners.Count == 0)
+            {
+                await DisplayAlert("Chyba", "Nejdříve načti startovní listinu.", "OK");
+                return;
+            }
+
+            await Navigation.PushAsync(new FullListPage(_raceDataService));
         }
+
 
         private async void OnNavigateToCurrentMinute(object sender, EventArgs e)
         {

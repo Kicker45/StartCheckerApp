@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using StartCheckerApp.Views;
+using CommunityToolkit.Maui;
+
+
 
 namespace StartCheckerApp
 {
@@ -10,6 +13,7 @@ namespace StartCheckerApp
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -18,7 +22,7 @@ namespace StartCheckerApp
             // Nastavení NavigationPage
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddTransient<GetStartlistPage>();
-            builder.Services.AddTransient<RunnerDetailPage>();
+            builder.Services.AddTransient<RunnerDetailPopup>();
             builder.Services.AddTransient<FullListPage>();
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<CurrentMinutePage>();
@@ -31,13 +35,16 @@ namespace StartCheckerApp
             {
                 return new HttpClient
                 {
-                    BaseAddress = new Uri("http://10.0.2.2:32769/api/StartList/"),
+                    BaseAddress = new Uri(Constants.RestUrl),
                     Timeout = TimeSpan.FromSeconds(10),
                     DefaultRequestHeaders = { Connection = { "keep-alive" } }
                 };
             });
+            // Přidání služby pro správu startovky
+            builder.Services.AddSingleton<RaceDataService>();
 
-
+            // Přidání toolkit pro správné fungování popup oken
+            builder.UseMauiApp<App>().UseMauiCommunityToolkit();
 
 #if DEBUG
             builder.Logging.AddDebug();
