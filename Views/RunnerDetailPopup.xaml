@@ -6,12 +6,24 @@
 
     <VerticalStackLayout Padding="20" BackgroundColor="White">
         <Label Text="Úprava závodníka" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
-        <Entry x:Name="RegistrationNumberEntry" Placeholder="Registrační číslo"/>
-        <Entry x:Name="FirstNameEntry" Placeholder="Křestní jméno"/>
-        <Entry x:Name="SurnameEntry" Placeholder="Příjmení"/>
-        <Entry x:Name="CategoryEntry" Placeholder="Kategorie"/>
-        <Entry x:Name="SINumberEntry" Placeholder="Číslo SI čipu" Keyboard="Numeric"/>
-        <Entry x:Name="StartTimeEntry" Placeholder="Startovní čas" Keyboard="Time"/>
+
+        <Label Text="Registrační číslo:" FontSize="16" FontAttributes="Bold"/>
+        <Entry x:Name="RegistrationNumberEntry" Placeholder="Zadejte registrační číslo"/>
+
+        <Label Text="Křestní jméno:" FontSize="16" FontAttributes="Bold"/>
+        <Entry x:Name="FirstNameEntry" Placeholder="Zadejte křestní jméno"/>
+
+        <Label Text="Příjmení:" FontSize="16" FontAttributes="Bold"/>
+        <Entry x:Name="SurnameEntry" Placeholder="Zadejte příjmení"/>
+
+        <Label Text="Kategorie:" FontSize="16" FontAttributes="Bold"/>
+        <Entry x:Name="CategoryEntry" Placeholder="Zadejte kategorii"/>
+
+        <Label Text="Číslo SI čipu:" FontSize="16" FontAttributes="Bold"/>
+        <Entry x:Name="SINumberEntry" Placeholder="Zadejte číslo SI čipu" Keyboard="Numeric"/>
+
+        <Label Text="Startovní čas:" FontSize="16" FontAttributes="Bold"/>
+        <Entry x:Name="StartTimeEntry" Placeholder="Zadejte startovní čas" Keyboard="Time"/>
 
         <HorizontalStackLayout Spacing="10">
             <Button Text="Uložit" BackgroundColor="Green" Clicked="OnSaveClicked"/>

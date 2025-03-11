@@ -18,5 +18,11 @@ namespace StartCheckerApp.Models
 
         [JsonPropertyName("lastUpdate")]
         public DateTime LastUpdate { get; set; }
+
+        [JsonPropertyName("startFlag")]
+        public bool StartFlag { get; set; }
+
+        [JsonPropertyName("status")]
+        public string Status { get; set; }
     }
 }

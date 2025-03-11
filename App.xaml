@@ -2,9 +2,11 @@
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:StartCheckerApp"
+             xmlns:services="clr-namespace:StartCheckerApp.Services"
              x:Class="StartCheckerApp.App">
     <Application.Resources>
         <ResourceDictionary>
+            <services:StatusToColorConverter x:Key="StatusToColorConverter"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />

@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using StartCheckerApp.Models;
+using StartCheckerApp.Services;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -11,13 +12,15 @@ namespace StartCheckerApp.Views
         private Runner _runner;
         private readonly HttpClient _httpClient;
         private readonly RaceDataService _raceDataService;
+        private readonly RunnerDatabaseService _runnerDatabase;
 
-        public RunnerDetailPopup(Runner runner, HttpClient httpClient, RaceDataService raceDataService)
+        public RunnerDetailPopup(Runner runner, HttpClient httpClient, RaceDataService raceDataService, RunnerDatabaseService runnerDatabase)
         {
             InitializeComponent();
             _runner = runner;
             _httpClient = httpClient;
             _raceDataService = raceDataService;
+            _runnerDatabase = runnerDatabase;
 
             // Naplnìní vstupních polí daty závodníka
             RegistrationNumberEntry.Text = _runner.RegistrationNumber;
@@ -52,19 +55,18 @@ namespace StartCheckerApp.Views
                 return;
             }
 
-            int responseCode;
             if (_runner.ID == 0)
             {
-                // Nový závodník -> POST
-                responseCode = await _raceDataService.AddRunnerToServer(_runner);
+                // Nový závodník -> Uložit do lokální DB
+                await _runnerDatabase.AddRunnerAsync(_runner);
             }
             else
             {
-                // Existující závodník -> PATCH
-                responseCode = await _raceDataService.UpdateRunnerOnServer(_runner);
+                // Existující závodník -> Uložit aktualizaci do lokální DB
+                await _runnerDatabase.UpdateRunnerAsync(_runner);
             }
 
-            Close(responseCode); // Vrátíme kód odpovìdi API
+            Close(200); // Vrátíme úspìšný kód odpovìdi
         }
 
 

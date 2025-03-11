@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using StartCheckerApp.Views;
+using StartCheckerApp.Services;
 using CommunityToolkit.Maui;
+using SQLite;
 
 
 
@@ -27,6 +29,11 @@ namespace StartCheckerApp
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<CurrentMinutePage>();
 
+            // Inicializace lokální SQLite databáze
+            var database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
+            builder.Services.AddSingleton(database);
+            builder.Services.AddSingleton<RunnerDatabaseService>();
+
             // Přidání http clienta
             var clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
@@ -36,13 +43,14 @@ namespace StartCheckerApp
                 return new HttpClient
                 {
                     BaseAddress = new Uri(Constants.RestUrl),
-                    Timeout = TimeSpan.FromSeconds(10),
+                    Timeout = TimeSpan.FromSeconds(5),
                     DefaultRequestHeaders = { Connection = { "keep-alive" } }
                 };
             });
-            // Přidání služby pro správu startovky
-            builder.Services.AddSingleton<RaceDataService>();
 
+            // Přidání služeb pro správu startovky
+            builder.Services.AddSingleton<RaceDataService>();
+            builder.Services.AddSingleton<StatusToColorConverter>();
 
             // Přidání toolkit pro správné fungování popup oken
             builder.UseMauiApp<App>().UseMauiCommunityToolkit();

@@ -1,15 +1,19 @@
-﻿namespace StartCheckerApp.Views
+﻿using StartCheckerApp.Services;
+
+namespace StartCheckerApp.Views
 {
     public partial class MainPage : ContentPage
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly RaceDataService _raceDataService;
+        private readonly RunnerDatabaseService _runnerDatabase;
 
-        public MainPage(IServiceProvider serviceProvider, RaceDataService raceDataService)
+        public MainPage(IServiceProvider serviceProvider, RaceDataService raceDataService, RunnerDatabaseService runnerDatabase)
         {
             InitializeComponent();
             _serviceProvider = serviceProvider;
             _raceDataService = raceDataService;
+            _runnerDatabase = runnerDatabase;
             
         }
 
@@ -21,14 +25,18 @@
 
         private async void OnNavigateToFullList(object sender, EventArgs e)
         {
-            if (_raceDataService.Runners.Count == 0)
+            var runners = await _runnerDatabase.GetRunnersAsync(); // Načteme závodníky z SQLite
+
+            if (runners.Count == 0)
             {
                 await DisplayAlert("Chyba", "Nejdříve načti startovní listinu.", "OK");
                 return;
             }
+
             var fullListPage = _serviceProvider.GetRequiredService<FullListPage>();
             await Navigation.PushAsync(fullListPage);
         }
+
 
 
         private async void OnNavigateToCurrentMinute(object sender, EventArgs e)

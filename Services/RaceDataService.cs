@@ -1,4 +1,5 @@
 ﻿using StartCheckerApp.Models;
+using StartCheckerApp.Services;
 using System.Text;
 using System.Text.Json;
 
@@ -6,13 +7,16 @@ namespace StartCheckerApp
 {
     public class RaceDataService
     {
+        private readonly RunnerDatabaseService _runnerDatabase;
         private readonly HttpClient _httpClient;
         public int RaceId { get; private set; } // ID aktuálního závodu
         public List<Runner> Runners { get; private set; } = new List<Runner>();
+        public DateTime LastSyncTime { get; internal set; }
 
-        public RaceDataService(HttpClient httpClient)
+        public RaceDataService(HttpClient httpClient, RunnerDatabaseService runnerDatabase)
         {
             _httpClient = httpClient;
+            _runnerDatabase = runnerDatabase;
         }
         public void SetRace(int raceId, List<Runner> runners)
         {
@@ -72,6 +76,29 @@ namespace StartCheckerApp
                 return 500; // Interní chyba serveru
             }
         }
+
+        public async Task SaveStartListToDatabase(int raceId, List<Runner> runners)
+        {
+            await _runnerDatabase.InitializeAsync(); // Zajistí vytvoření tabulky, pokud neexistuje
+
+            foreach (var runner in runners)
+            {
+                runner.LastModified = DateTime.UtcNow; // Nastavíme timestamp změny
+                var existingRunner = await _runnerDatabase.GetRunnerByIdAsync(runner.ID);
+
+                if (existingRunner != null)
+                {
+                    await _runnerDatabase.UpdateRunnerAsync(runner); // Aktualizujeme existujícího závodníka
+                }
+                else
+                {
+                    await _runnerDatabase.AddRunnerAsync(runner); // Přidáme nového závodníka
+                }
+            }
+
+            LastSyncTime = DateTime.UtcNow; // Aktualizace času poslední synchronizace
+        }
+
 
     }
 }

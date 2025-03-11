@@ -5,40 +5,75 @@
 
     <Grid RowDefinitions="Auto,*">
         <!-- Vlastní horní lišta -->
-        <Grid BackgroundColor="Black" Padding="10,0,10,0" HeightRequest="50" >
-            <Label x:Name="TimeLabel" FontSize="25" TextColor="White"
-                   FontAttributes="Bold" HorizontalOptions="Start" VerticalOptions="Center"/>
+        <Grid BackgroundColor="Black" Padding="10,0,10,0" HeightRequest="50" ColumnDefinitions="Auto, *, Auto, Auto" >
+            <Label x:Name="TimeLabel" 
+                   FontSize="25" TextColor="White" FontAttributes="Bold" 
+                   HorizontalOptions="Start" VerticalOptions="Center"
+                   Grid.Column="0"/>
+            <BoxView Grid.Column="1" WidthRequest="1"></BoxView>
+            <Button Text="Sync" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="0"
+                    Grid.Column="2"
+                    BackgroundColor="LightBlue"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    Clicked="OnSyncClicked"
+                    />
             <Button Text="+" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="0"
-                
-                BackgroundColor="#4AF94F" Clicked="OnAddRunnerClicked"
-                HorizontalOptions="End" VerticalOptions="Center"/>
+                Grid.Column="3"
+                BackgroundColor="#4AF94F" 
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                Clicked="OnAddRunnerClicked"
+                />
         </Grid>
+
+        <ActivityIndicator x:Name="LoadingIndicator"
+                   IsRunning="False"
+                   IsVisible="False"
+                   Color="Orange"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"/>
+
 
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="5" >
-                <CollectionView x:Name="RunnersList" SelectionMode="Single" SelectionChanged="OnRunnerSelected" >
+                <CollectionView x:Name="RunnersList"
+                IsGrouped="true"
+                SelectionMode="Single"
+                SelectionChanged="OnRunnerClicked">
+                    <CollectionView.GroupHeaderTemplate>
+                        <DataTemplate>
+                            <Grid BackgroundColor="Black" Padding="5">
+                                <Label Text="{Binding StartTime}" FontSize="20" TextColor="White" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.GroupHeaderTemplate>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Padding="5" Margin="2" BackgroundColor="#D9D9D9">
+                            <Border Padding="5" Margin="2"
+                                    BackgroundColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}">
                                 <Grid ColumnDefinitions="Auto,*,Auto,Auto" HorizontalOptions="Fill">
 
                                     <!-- Sloupec 1: SI Číslo -->
-                                    <Label Grid.Column="0" Text="{Binding SINumber}" FontSize="24" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Start" MaximumWidthRequest="120" MinimumWidthRequest="100"/>
+                                    <Label Grid.Column="0" Text="{Binding SINumber}" FontSize="24" FontAttributes="Bold"
+                           VerticalOptions="Center" HorizontalOptions="Start"
+                           MaximumWidthRequest="120" MinimumWidthRequest="100"/>
 
                                     <!-- Sloupec 2: Jméno a Příjmení -->
-                                    <Label Grid.Column="1" Text="{Binding FullName}" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Start" Margin="5,0,5,0"/>
-
+                                    <Label Grid.Column="1" Text="{Binding FullName}" FontSize="20" FontAttributes="Bold"
+                           VerticalOptions="Center" HorizontalOptions="Start" Margin="5,0,5,0"/>
 
                                     <!-- Sloupec 3: Kategorie + Registrační číslo -->
                                     <StackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center">
-                                        <Label Text="{Binding Category}" FontSize="16" TextColor="Black" HorizontalOptions="End" FontAttributes="Bold"/>
-                                        <Label Text="{Binding RegistrationNumber}" FontSize="16" TextColor="Black" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Category}" FontSize="16" TextColor="Black" HorizontalOptions="End"
+                               FontAttributes="Bold"/>
+                                        <Label Text="{Binding RegistrationNumber}" FontSize="16" TextColor="Black"
+                               FontAttributes="Bold"/>
                                     </StackLayout>
 
                                     <!-- Sloupec 4: Editační tlačítko -->
                                     <Button Grid.Column="3" Text="✏️" FontSize="20" BackgroundColor="Transparent"
                             Clicked="OnEditRunnerClicked" HorizontalOptions="End" Padding="0"/>
-
                                 </Grid>
                             </Border>
                         </DataTemplate>
