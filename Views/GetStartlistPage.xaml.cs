@@ -43,6 +43,9 @@ namespace StartCheckerApp.Views
 
                     if (raceData.StartList.Count > 0)
                     {
+                        // Nastavení RaceId v RaceDataService pro synchronizaci
+                        _raceDataService.SetRace(raceData.RaceId, raceData.StartList);
+
                         // Uložit do SQLite místo pøímého použití
                         await _raceDataService.SaveStartListToDatabase(raceData.RaceId, raceData.StartList);
 

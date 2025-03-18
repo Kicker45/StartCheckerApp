@@ -3,6 +3,8 @@ using CommunityToolkit.Maui.Views;
 using System.ComponentModel;
 using StartCheckerApp.Services;
 using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Text;
 
 namespace StartCheckerApp.Views
 {
@@ -74,31 +76,55 @@ namespace StartCheckerApp.Views
             var selectedRunner = (Runner)e.CurrentSelection.FirstOrDefault();
             if (selectedRunner != null)
             {
-                selectedRunner.StartFlag = !selectedRunner.StartFlag;
-                selectedRunner.Status = selectedRunner.StartFlag ? "Started" : "None";
-                selectedRunner.StartPassage = selectedRunner.StartFlag ? DateTime.UtcNow : null;
-                selectedRunner.LastModified = DateTime.UtcNow; // Pro offline synchronizaci
+                if (selectedRunner.Started == false)
+                {
+                    selectedRunner.StartFlag = true;
+                    selectedRunner.Started = true;
+                    selectedRunner.DNS = false;
+                    selectedRunner.StartPassage = DateTime.UtcNow;
+                    selectedRunner.LastUpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    bool answer = await DisplayAlert(
+                    "Upravit stav závodníka",
+                    "Tento závodník je oznaèen jako odstartovaný. Chcete ho oznaèit jako neodstartovaný?",
+                    "Ano",
+                    "Ne");
 
-                // Uložit zmìnu do SQLite
-                await _runnerDatabase.UpdateRunnerAsync(selectedRunner);
+                    if (answer)
+                    {
+
+                        selectedRunner.Started = false;
+                        selectedRunner.DNS = false;
+                        selectedRunner.StartPassage = null;
+                        selectedRunner.StartFlag = false;
+                        selectedRunner.LastUpdatedAt = DateTime.UtcNow;
+                    }
+                }
 
                 // Najdeme správnou skupinu ve `GroupedRunners`
                 if (RunnersList.ItemsSource is ObservableCollection<GroupedRunners> groupedRunners)
                 {
-                    var group = groupedRunners.FirstOrDefault(g => g.StartTime == selectedRunner.StartTime.ToString("d MMMM HH:mm:ss"));
+                    var group = groupedRunners.FirstOrDefault(g => g.StartTime == selectedRunner.StartTime.ToString("HH:mm"));
+
                     if (group != null)
                     {
-                        // Najdeme závodníka ve skupinì
-                        var index = group.IndexOf(group.FirstOrDefault(r => r.ID == selectedRunner.ID));
+                        int index = group.IndexOf(selectedRunner);
                         if (index >= 0)
                         {
-                            group[index] = selectedRunner; // Aktualizujeme pouze vybraného závodníka
+                            // Odebereme a znovu vložíme runnera, èímž donutíme UI k aktualizaci
+                            group.RemoveAt(index);
+                            group.Insert(index, selectedRunner);
                         }
                     }
+
                 }
+                // Uložit zmìnu do SQLite
+                await _runnerDatabase.UpdateRunnerAsync(selectedRunner);
             }
 
-    ((CollectionView)sender).SelectedItem = null; // Zruší výbìr po kliknutí
+        ((CollectionView)sender).SelectedItem = null; // Zruší výbìr po kliknutí
         }
 
 
@@ -120,10 +146,11 @@ namespace StartCheckerApp.Views
                 FirstName = "",
                 Surname = "",
                 SINumber = 0,
-                StartTime = DateTime.UtcNow,
+                StartTime = DateTime.UtcNow, //TODO potøeba zmìnit
                 StartPassage = null,
                 Category = "",
-                Status = "DNS",
+                DNS = false,
+                Started = false,
                 RaceId = _raceDataService.RaceId
             };
 
@@ -135,55 +162,15 @@ namespace StartCheckerApp.Views
             LoadingIndicator.IsVisible = true;
             LoadingIndicator.IsRunning = true;
 
-            bool isServerAvailable = await CheckServerAvailability();
-
-            if (!isServerAvailable)
-            {
-                await DisplayAlert("Synchronizace", "Nepodaøilo se navázat spojení se serverem. Zmìny budou uchovány lokálnì.", "OK");
-                LoadingIndicator.IsRunning = false;
-                LoadingIndicator.IsVisible = false;
-                return;
-            }
-
-            var modifiedRunners = (await _runnerDatabase.GetRunnersAsync())
-                .Where(r => r.LastModified > _raceDataService.LastSyncTime)
-                .ToList();
-
-            if (modifiedRunners.Count == 0)
-            {
-                await DisplayAlert("Synchronizace", "Žádné nové zmìny k odeslání.", "OK");
-                LoadingIndicator.IsRunning = false;
-                LoadingIndicator.IsVisible = false;
-                return;
-            }
-
-            foreach (var runner in modifiedRunners)
-            {
-                await _raceDataService.UpdateRunnerOnServer(runner);
-            }
-
-            _raceDataService.LastSyncTime = DateTime.UtcNow;
-            await DisplayAlert("Synchronizace", "Všechny zmìny byly odeslány na server.", "OK");
+            await _raceDataService.SyncRunnersWithServer();
 
             LoadingIndicator.IsRunning = false;
             LoadingIndicator.IsVisible = false;
+
+            // Znovu naèteme startovní listinu z lokální SQLite databáze
+            LoadRunners();
         }
 
-
-
-        private async Task<bool> CheckServerAvailability()
-        {
-            try
-            {
-                string url = $"get-startlist?raceId=1";
-                HttpResponseMessage response = await _httpClient.GetAsync(url);
-                return response.IsSuccessStatusCode;
-            }
-            catch
-            {
-                return false; // Pokud dojde k chybì, server není dostupný
-            }
-        }
 
 
         private async Task HandleRunnerPopup(Runner runner)
@@ -201,11 +188,13 @@ namespace StartCheckerApp.Views
             }
         }
 
+
+
         private async void ShowResponseAlert(int responseCode)
         {
             string message = responseCode switch
             {
-                200 => "Úspìch: Závodník byl úspìšnì aktualizován/pøidán.",
+                200 => "Úspìch: Závodník byl úspìšnì aktualizován/pøidán do lokální databáze. Pro synchronizaci se serverem kliknìte na SYNC.",
                 400 => "Chyba: Neplatná data. Zkontrolujte zadané údaje.",
                 404 => "Chyba: Závodník nebyl nalezen.",
                 409 => "Chyba: Závodník s tímto ID již existuje.",

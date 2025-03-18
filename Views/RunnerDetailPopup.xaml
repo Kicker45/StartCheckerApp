@@ -8,25 +8,31 @@
         <Label Text="Úprava závodníka" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
 
         <Label Text="Registrační číslo:" FontSize="16" FontAttributes="Bold"/>
-        <Entry x:Name="RegistrationNumberEntry" Placeholder="Zadejte registrační číslo"/>
+        <Label x:Name="RegistrationNumberEntry"/>
 
         <Label Text="Křestní jméno:" FontSize="16" FontAttributes="Bold"/>
-        <Entry x:Name="FirstNameEntry" Placeholder="Zadejte křestní jméno"/>
+        <Label x:Name="FirstNameEntry"/>
 
         <Label Text="Příjmení:" FontSize="16" FontAttributes="Bold"/>
-        <Entry x:Name="SurnameEntry" Placeholder="Zadejte příjmení"/>
+        <Label x:Name="SurnameEntry"/>
 
         <Label Text="Kategorie:" FontSize="16" FontAttributes="Bold"/>
-        <Entry x:Name="CategoryEntry" Placeholder="Zadejte kategorii"/>
+        <Label x:Name="CategoryEntry"/>
 
         <Label Text="Číslo SI čipu:" FontSize="16" FontAttributes="Bold"/>
         <Entry x:Name="SINumberEntry" Placeholder="Zadejte číslo SI čipu" Keyboard="Numeric"/>
 
+        <!-- Nové pole pro datum -->
+        <Label Text="Startovní den:" FontSize="16" FontAttributes="Bold"/>
+        <DatePicker x:Name="StartDatePicker" Format="dd.MM.yyyy"/>
+
+        <!-- Nové pole pro čas -->
         <Label Text="Startovní čas:" FontSize="16" FontAttributes="Bold"/>
-        <Entry x:Name="StartTimeEntry" Placeholder="Zadejte startovní čas" Keyboard="Time"/>
+        <TimePicker x:Name="StartTimePicker" Format="HH:mm:ss"/>
 
         <HorizontalStackLayout Spacing="10">
             <Button Text="Uložit" BackgroundColor="Green" Clicked="OnSaveClicked"/>
+            <Button Text="DNS" BackgroundColor="Orange" Clicked="OnDNSClicked"/>
             <Button Text="Zavřít" BackgroundColor="Red" Clicked="OnCloseClicked"/>
         </HorizontalStackLayout>
     </VerticalStackLayout>

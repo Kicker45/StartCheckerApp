@@ -51,7 +51,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Border Padding="5" Margin="2"
-                                    BackgroundColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}">
+                                    BackgroundColor="{Binding ComputedStatus, Converter={StaticResource StatusToColorConverter}}">
                                 <Grid ColumnDefinitions="Auto,*,Auto,Auto" HorizontalOptions="Fill">
 
                                     <!-- Sloupec 1: SI Číslo -->

@@ -32,13 +32,13 @@ namespace StartCheckerApp.Services
 
         public async Task AddRunnerAsync(Runner runner)
         {
-            runner.LastModified = DateTime.UtcNow;
+            runner.LastUpdatedAt = DateTime.UtcNow;
             await _database.InsertAsync(runner);
         }
 
         public async Task UpdateRunnerAsync(Runner runner)
         {
-            runner.LastModified = DateTime.UtcNow;
+            runner.LastUpdatedAt = DateTime.UtcNow;
             await _database.UpdateAsync(runner);
         }
 

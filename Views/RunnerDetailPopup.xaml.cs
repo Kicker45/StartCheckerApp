@@ -29,8 +29,9 @@ namespace StartCheckerApp.Views
             CategoryEntry.Text = _runner.Category;
             SINumberEntry.Text = _runner.SINumber.ToString();
 
-            // Zobrazení èasu v HH:mm pro uživatele
-            StartTimeEntry.Text = _runner.StartTime.ToLocalTime().ToString("HH:mm");
+            // Nastavení DatePicker a TimePicker
+            StartDatePicker.Date = _runner.StartTime.ToLocalTime().Date;
+            StartTimePicker.Time = _runner.StartTime.ToLocalTime().TimeOfDay;
         }
 
         private async void OnSaveClicked(object sender, EventArgs e)
@@ -41,19 +42,18 @@ namespace StartCheckerApp.Views
             _runner.Category = CategoryEntry.Text;
             _runner.SINumber = int.Parse(SINumberEntry.Text);
 
-            // Pøevod z HH:mm na UTC DateTime
-            if (DateTime.TryParseExact(StartTimeEntry.Text, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedTime))
-            {
-                _runner.StartTime = DateTime.SpecifyKind(
-                    new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, parsedTime.Hour, parsedTime.Minute, 0),
-                    DateTimeKind.Utc
-                );
-            }
-            else
-            {
-                Close(400); // Neplatný formát èasu, vracíme chybu
-                return;
-            }
+            // Spojení vybraného data a èasu do jednoho DateTime objektu
+            DateTime selectedDateTime = new DateTime(
+                StartDatePicker.Date.Year,
+                StartDatePicker.Date.Month,
+                StartDatePicker.Date.Day,
+                StartTimePicker.Time.Hours,
+                StartTimePicker.Time.Minutes,
+                StartTimePicker.Time.Seconds
+            );
+
+            // Konverze na UTC a uložení do modelu
+            _runner.StartTime = DateTime.SpecifyKind(selectedDateTime, DateTimeKind.Utc);
 
             if (_runner.ID == 0)
             {
@@ -69,10 +69,30 @@ namespace StartCheckerApp.Views
             Close(200); // Vrátíme úspìšný kód odpovìdi
         }
 
-
         private void OnCloseClicked(object sender, EventArgs e)
         {
             Close(null); // Zavøe popup bez zmìn
+        }
+
+        private async void OnDNSClicked(object sender, EventArgs e)
+        {
+            // Nastavení pøíznaku DNS
+            _runner.DNS = true;
+
+            // Pokud mìl závodník zaznamenaný start, musíme ho vymazat
+            _runner.StartPassage = null;
+            _runner.Started = false;
+            _runner.Late = false;
+            _runner.StartFlag = false;
+
+            // Aktualizace èasu poslední zmìny
+            _runner.LastUpdatedAt = DateTime.UtcNow;
+
+            // Uložení zmìny do lokální databáze
+            await _runnerDatabase.UpdateRunnerAsync(_runner);
+
+            // Zavøení popupu po uložení
+            Close(200);
         }
     }
 }

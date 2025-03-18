@@ -48,12 +48,65 @@ namespace StartCheckerApp.Models
             set { _startFlag = value; OnPropertyChanged(); }
         }
 
-        [JsonPropertyName("status")]
-        private string _status;
-        public string Status
+        [JsonPropertyName("started")]
+        private bool _started;
+        public bool Started
         {
-            get => _status;
-            set { _status = value; OnPropertyChanged(); }
+            get => _started;
+            set
+            {
+                if (_started != value)
+                {
+                    _started = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ComputedStatus)); // Nová vlastnost pro UI
+                }
+            }
+        }
+
+
+        [JsonPropertyName("dns")]
+        private bool _dns;
+        public bool DNS
+        {
+            get => _dns;
+            set
+            {
+                if (_dns != value)
+                {
+                    _dns = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ComputedStatus)); // Nová vlastnost pro UI
+                }
+            }
+        }
+
+        [JsonPropertyName("late")]
+        private bool _late;
+        public bool Late
+        {
+            get => _late;
+            set
+            {
+                if (_late != value)
+                {
+                    _late = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ComputedStatus)); // Nová vlastnost pro UI
+                }
+            }
+
+        }
+        //MAUI neumí multibinding proto je nutné použít toto pro změnu UI
+        public string ComputedStatus
+        {
+            get
+            {
+                if (Started) return "Started";
+                if (DNS) return "DNS";
+                if (Late) return "Late";
+                return "None";
+            }
         }
 
         [JsonPropertyName("raceId")]
@@ -64,12 +117,12 @@ namespace StartCheckerApp.Models
         [JsonIgnore]
         public string StartMinute => StartTime.ToString("HH:mm");
 
-        [JsonIgnore]
-        private DateTime _lastModified;
-        public DateTime LastModified
+        [JsonPropertyName("lastUpdatedAt")]
+        private DateTime _LastUpdatedAt;
+        public DateTime LastUpdatedAt
         {
-            get => _lastModified;
-            set { _lastModified = value; OnPropertyChanged(); }
+            get => _LastUpdatedAt;
+            set { _LastUpdatedAt = value; OnPropertyChanged(); }
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

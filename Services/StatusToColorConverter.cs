@@ -11,10 +11,15 @@ namespace StartCheckerApp.Services
         {
             if (value is string status)
             {
-                if (status == "Started") {
-                    return Colors.LightGreen;
-                        }
+                return status switch
+                {
+                    "Started" => Colors.LightGreen,
+                    "DNS" => Colors.Yellow,
+                    "Late" => Colors.Orange,
+                    _ => Colors.White
+                };
             }
+
             return Colors.White;
         }
 

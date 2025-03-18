@@ -4,8 +4,6 @@ using StartCheckerApp.Services;
 using CommunityToolkit.Maui;
 using SQLite;
 
-
-
 namespace StartCheckerApp
 {
     public static class MauiProgram
@@ -13,15 +11,16 @@ namespace StartCheckerApp
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
+            // 1) Registrace CommunityToolkit a fontů
             builder
-                .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
-            // Nastavení NavigationPage
+            // 2) Registrace stránek (NavigationPage a další)
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddTransient<GetStartlistPage>();
             builder.Services.AddTransient<RunnerDetailPopup>();
@@ -29,18 +28,22 @@ namespace StartCheckerApp
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<CurrentMinutePage>();
 
-            // Inicializace lokální SQLite databáze
+            // 3) Inicializace lokální SQLite databáze
+            //    Vytvoříme instanci SQLiteAsyncConnection a přidáme ji jako singleton
             var database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
             builder.Services.AddSingleton(database);
+
+            // 4) Další služby související s DB nebo logikou
             builder.Services.AddSingleton<RunnerDatabaseService>();
 
-            // Přidání http clienta
-            var clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-
+            // 5) Přidání HTTP klienta (s nastavením callbacku pro certifikáty)
+            var clientHandler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
             builder.Services.AddSingleton(sp =>
             {
-                return new HttpClient
+                return new HttpClient(clientHandler)
                 {
                     BaseAddress = new Uri(Constants.RestUrl),
                     Timeout = TimeSpan.FromSeconds(5),
@@ -48,18 +51,29 @@ namespace StartCheckerApp
                 };
             });
 
-            // Přidání služeb pro správu startovky
+            // 6) Přidání dalších služeb
             builder.Services.AddSingleton<RaceDataService>();
             builder.Services.AddSingleton<StatusToColorConverter>();
 
-            // Přidání toolkit pro správné fungování popup oken
-            builder.UseMauiApp<App>().UseMauiCommunityToolkit();
+            // 7) Registrace třídy App do Dependency Injection (DI)
+            //    - injektujeme MainPage a SQLiteAsyncConnection do App
+            builder.Services.AddSingleton<App>(sp =>
+            {
+                var mainPage = sp.GetRequiredService<MainPage>();
+                var dbConn = sp.GetRequiredService<SQLiteAsyncConnection>();
+                return new App(mainPage, dbConn);
+            });
 
+            // 8) Logging v debug modu
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+            // 9) Vytvoříme skutečnou MAUI aplikaci
+            //    - použitím delegáta, který si z DI vyžádá App
+            return builder
+                .UseMauiApp(sp => sp.GetRequiredService<App>()) // sp => service provider
+                .Build();
         }
     }
 }
