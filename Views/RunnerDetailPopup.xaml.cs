@@ -76,6 +76,7 @@ namespace StartCheckerApp.Views
 
         private async void OnDNSClicked(object sender, EventArgs e)
         {
+            //TODO popup pro dotázaní na to, že chci dát DNS nìkoho kdo startoval
             // Nastavení pøíznaku DNS
             _runner.DNS = true;
 

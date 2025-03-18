@@ -76,32 +76,52 @@ namespace StartCheckerApp.Views
             var selectedRunner = (Runner)e.CurrentSelection.FirstOrDefault();
             if (selectedRunner != null)
             {
-                if (selectedRunner.Started == false)
+                if (!selectedRunner.DNS)
                 {
-                    selectedRunner.StartFlag = true;
-                    selectedRunner.Started = true;
-                    selectedRunner.DNS = false;
-                    selectedRunner.StartPassage = DateTime.UtcNow;
-                    selectedRunner.LastUpdatedAt = DateTime.UtcNow;
+                    if (!selectedRunner.Started)
+                    {
+                        selectedRunner.StartFlag = true;
+                        selectedRunner.Started = true;
+                        selectedRunner.DNS = false;
+                        selectedRunner.StartPassage = DateTime.UtcNow;
+                        selectedRunner.LastUpdatedAt = DateTime.UtcNow;
+                    }
+                    else
+                    {
+                        bool answer = await DisplayAlert(
+                        "Upravit stav závodníka",
+                        "Tento závodník je oznaèen jako odstartovaný. Chcete ho oznaèit jako NEodstartovaný?",
+                        "Ano",
+                        "Ne");
+
+                        if (answer)
+                        {
+                            selectedRunner.StartFlag = false;
+                            selectedRunner.Started = false;
+                            selectedRunner.DNS = false;
+                            selectedRunner.StartPassage = null;
+                            selectedRunner.LastUpdatedAt = DateTime.UtcNow;
+                        }
+                    }
+
                 }
                 else
                 {
                     bool answer = await DisplayAlert(
                     "Upravit stav závodníka",
-                    "Tento závodník je oznaèen jako odstartovaný. Chcete ho oznaèit jako neodstartovaný?",
+                    "Tento závodník je oznaèen jako DNS. Chcete ho oznaèit jako odstartovaný?",
                     "Ano",
                     "Ne");
-
                     if (answer)
                     {
-
-                        selectedRunner.Started = false;
+                        selectedRunner.StartFlag = true;
+                        selectedRunner.Started = true;
                         selectedRunner.DNS = false;
-                        selectedRunner.StartPassage = null;
-                        selectedRunner.StartFlag = false;
+                        selectedRunner.StartPassage = DateTime.UtcNow;
                         selectedRunner.LastUpdatedAt = DateTime.UtcNow;
                     }
                 }
+               
 
                 // Najdeme správnou skupinu ve `GroupedRunners`
                 if (RunnersList.ItemsSource is ObservableCollection<GroupedRunners> groupedRunners)
