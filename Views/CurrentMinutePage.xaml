@@ -1,12 +1,98 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StartCheckerApp.Views.CurrentMinutePage"
-             Title="CurrentMinutePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
-</ContentPage>
+<views:BaseRunnersPage
+    xmlns = "http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:StartCheckerApp.Views"
+    x:Class="StartCheckerApp.Views.CurrentMinutePage">
+
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Vlastní horní lišta -->
+        <Grid Row="0" BackgroundColor="Black" Padding="10,0,10,0" HeightRequest="50" ColumnDefinitions="Auto, *, Auto, Auto" >
+            <Label x:Name="TimeLabelControl" 
+                   FontSize="25" TextColor="White" FontAttributes="Bold" 
+                   HorizontalOptions="Start" VerticalOptions="Center"
+                   Grid.Column="0"/>
+            <BoxView Grid.Column="1" WidthRequest="1"></BoxView>
+            <Button Text="Sync" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="0"
+                    Grid.Column="2"
+                    BackgroundColor="LightBlue"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    Clicked="OnSyncClicked"
+                    />
+            <Button Text="+" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="0"
+                Grid.Column="3"
+                BackgroundColor="#4AF94F" 
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                Clicked="OnAddRunnerClicked"
+                />
+        </Grid>
+
+        <!-- Indikátor načítání -->
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           Grid.Row="1"
+                           IsRunning="False"
+                           IsVisible="False"
+                           Color="Orange"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+
+        <!-- Seznam závodníků -->
+        <CollectionView x:Name="RunnersList"
+                        Grid.Row="2"
+                        IsGrouped="true"
+                        SelectionMode="Single"
+                        SelectionChanged="OnRunnerClicked">
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate>
+                    <Grid x:Name="HeaderGrid"  BackgroundColor="Black" Padding="5">
+                        <Label 
+                               x:Name="StartTimeText"
+                               Text="{Binding StartTime}"
+                               FontSize="40"
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+            <CollectionView.GestureRecognizers>
+                <SwipeGestureRecognizer Direction="Left" Swiped="OnSwipeLeft"/>
+                <SwipeGestureRecognizer Direction="Right" Swiped="OnSwipeRight"/>
+            </CollectionView.GestureRecognizers>
+
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="5" Margin="2"
+                            BackgroundColor="{Binding ComputedStatus, Converter={StaticResource StatusToColorConverter}}">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" HorizontalOptions="Fill">
+
+                            <!-- SI Číslo -->
+                            <Label Grid.Column="0" Text="{Binding SINumber}" FontSize="24" FontAttributes="Bold"
+                                   VerticalOptions="Center" HorizontalOptions="Start"
+                                   MaximumWidthRequest="120" MinimumWidthRequest="100"/>
+
+                            <!-- Jméno a Příjmení -->
+                            <Label Grid.Column="1" Text="{Binding FullName}" FontSize="20" FontAttributes="Bold"
+                                   VerticalOptions="Center" HorizontalOptions="Start" Margin="5,0,5,0"/>
+
+                            <!-- Kategorie a Registrační číslo -->
+                            <StackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label Text="{Binding Category}" FontSize="16" TextColor="Black" HorizontalOptions="End" FontAttributes="Bold"/>
+                                <Label Text="{Binding RegistrationNumber}" FontSize="16" TextColor="Black" FontAttributes="Bold"/>
+                            </StackLayout>
+
+                            <!-- Tlačítko pro editaci -->
+                            <Button Grid.Column="3" Text="✏️" FontSize="20" BackgroundColor="Transparent"
+                                    Clicked="OnEditRunnerClicked" HorizontalOptions="End" Padding="0"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</views:BaseRunnersPage>

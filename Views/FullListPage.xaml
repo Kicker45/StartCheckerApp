@@ -1,12 +1,14 @@
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StartCheckerApp.Views.FullListPage">
+<views:BaseRunnersPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:StartCheckerApp.Views"
+    x:Class="StartCheckerApp.Views.FullListPage">
 
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
         <!-- Vlastní horní lišta -->
-        <Grid BackgroundColor="Black" Padding="10,0,10,0" HeightRequest="50" ColumnDefinitions="Auto, *, Auto, Auto" >
-            <Label x:Name="TimeLabel" 
+        <Grid Row="0" BackgroundColor="Black" Padding="10,0,10,0" HeightRequest="50" ColumnDefinitions="Auto, *, Auto, Auto" >
+            <Label x:Name="TimeLabelControl" 
                    FontSize="25" TextColor="White" FontAttributes="Bold" 
                    HorizontalOptions="Start" VerticalOptions="Center"
                    Grid.Column="0"/>
@@ -34,8 +36,25 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Center"/>
 
+        <Grid Row="1" Padding="5" ColumnDefinitions="*, Auto" Margin="0,5,0,5">
+            <!-- Vyhledávací pole -->
+            <Entry x:Name="SearchEntry"
+           Grid.Column="0"
+           Placeholder="Hledat závodníka..."
+           TextChanged="OnSearchTextChanged"
+           />
 
-        <ScrollView Grid.Row="1">
+            <!-- Tlačítko pro zrušení hledání -->
+            <Button x:Name="ClearSearchButton"
+            Grid.Column="1"
+            Text="❌"
+            BackgroundColor="LightGray"
+            WidthRequest="40"
+            Clicked="OnClearSearchClicked" />
+        </Grid>
+
+
+        <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="5" >
                 <CollectionView x:Name="RunnersList"
                 IsGrouped="true"
@@ -82,4 +101,5 @@
             </VerticalStackLayout>
         </ScrollView>
     </Grid>
-</ContentPage>
+</views:BaseRunnersPage>
+    

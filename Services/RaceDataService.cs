@@ -36,11 +36,6 @@ namespace StartCheckerApp
             }
         }
 
-        public void AddRunner(Runner runner)
-        {
-            Runners.Add(runner);
-        }
-
         public async Task<int> AddRunnerToServer(Runner runner)
         {
             try

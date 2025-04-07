@@ -41,7 +41,15 @@ namespace StartCheckerApp.Views
 
         private async void OnNavigateToCurrentMinute(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new CurrentMinutePage());
+            var runners = await _runnerDatabase.GetRunnersAsync(); // Načteme závodníky z SQLite
+
+            if (runners.Count == 0)
+            {
+                await DisplayAlert("Chyba", "Nejdříve načti startovní listinu.", "OK");
+                return;
+            }
+            var currentMinutePage = _serviceProvider.GetRequiredService<CurrentMinutePage>();
+            await Navigation.PushAsync(currentMinutePage);
         }
 
         private async void OnNavigateToSettings(object sender, EventArgs e)
