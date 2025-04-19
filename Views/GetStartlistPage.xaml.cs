@@ -43,6 +43,9 @@ namespace StartCheckerApp.Views
 
                     if (raceData.StartList.Count > 0)
                     {
+                        // Pøed vložením nových dat smažeme existující závodníky v SQLite
+                        await _runnerDatabaseService.DeleteAllRunnersAsync(); 
+
                         // Nastavení RaceId v RaceDataService pro synchronizaci
                         _raceDataService.SetRace(raceData.RaceId, raceData.StartList);
 

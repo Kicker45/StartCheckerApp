@@ -46,5 +46,10 @@ namespace StartCheckerApp.Services
         {
             await _database.DeleteAsync(runner);
         }
+
+        public async Task DeleteAllRunnersAsync()
+        {
+            await _database.DeleteAllAsync<Runner>();
+        }
     }
 }

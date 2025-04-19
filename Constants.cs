@@ -14,10 +14,11 @@ namespace StartCheckerApp
 
         // URL of REST service (Android does not use localhost)
         // Use http cleartext for local deployment. Change to https for production
-        public static string LocalhostUrl = DeviceInfo.Platform == DevicePlatform.Android ? "10.0.2.2" : "localhost";
+        //public static string LocalhostUrl = DeviceInfo.Platform == DevicePlatform.Android ? "10.0.2.2" : "localhost";
+        public static string URL = "18.192.62.112";
         public static string Scheme = "http"; // or http
-        public static string Port = "5034"; //5034 for http; 32770 or 32771 for docker
-        public static string RestUrl = $"{Scheme}://{LocalhostUrl}:{Port}/api/StartList/";
+        public static string Port = "8080"; //5034 for http; 8080 for AWS docker
+        public static string RestUrl = $"{Scheme}://{URL}:{Port}/api/StartList/";
 
 
         //Local SQLite database 

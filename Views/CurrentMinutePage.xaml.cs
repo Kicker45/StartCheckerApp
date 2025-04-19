@@ -23,7 +23,6 @@ namespace StartCheckerApp.Views
         {
             InitializeComponent();
             LoadGroupedRunners();
-            SetupGestureNavigation();
             UpdateTimeLoop();
         }
 
@@ -75,17 +74,11 @@ namespace StartCheckerApp.Views
             if (_allGroupedRunners.Count > _currentMinuteIndex)
             {
                 RunnersList.ItemsSource = new ObservableCollection<RunnerGroup>
-        {
-            _allGroupedRunners[_currentMinuteIndex]
-        };
-
-
-
-
+                {
+                    _allGroupedRunners[_currentMinuteIndex]
+                };
             }
         }
-
-
 
         private async void OnRunnerClicked(object sender, SelectionChangedEventArgs e)
         {
@@ -141,43 +134,20 @@ namespace StartCheckerApp.Views
             UpdateToCurrentMinute();
         }
 
-        private void SetupGestureNavigation()
-        {
-            // Zajistíme swipe gesta pro CollectionView
-            var swipeLeft = new SwipeGestureRecognizer { Direction = SwipeDirection.Left };
-            swipeLeft.Swiped += OnSwipeLeft;
-
-            var swipeRight = new SwipeGestureRecognizer { Direction = SwipeDirection.Right };
-            swipeRight.Swiped += OnSwipeRight;
-
-            RunnersList.GestureRecognizers.Add(swipeLeft); // Pøiøadíme gesta pøímo k CollectionView
-            RunnersList.GestureRecognizers.Add(swipeRight);
-        }
-
-        private void OnSwipeLeft(object sender, SwipedEventArgs e)
-        {
-            GoToNextMinute();
-        }
-
-        private void OnSwipeRight(object sender, SwipedEventArgs e)
-        {
-            GoToPreviousMinute();
-        }
-
-        private void GoToNextMinute()
-        {
-            if (_currentMinuteIndex < _minuteGroups.Count - 1)
-            {
-                _currentMinuteIndex++;
-                SetCurrentMinuteGroup(_minuteGroups[_currentMinuteIndex]);
-            }
-        }
-
-        private void GoToPreviousMinute()
+        private void OnPreviousMinuteClicked(object sender, EventArgs e)
         {
             if (_currentMinuteIndex > 0)
             {
                 _currentMinuteIndex--;
+                SetCurrentMinuteGroup(_minuteGroups[_currentMinuteIndex]);
+            }
+        }
+
+        private void OnNextMinuteClicked(object sender, EventArgs e)
+        {
+            if (_currentMinuteIndex < _minuteGroups.Count - 1)
+            {
+                _currentMinuteIndex++;
                 SetCurrentMinuteGroup(_minuteGroups[_currentMinuteIndex]);
             }
         }
