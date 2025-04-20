@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StartCheckerApp.Views.SettingsPage"
-             Title="SettingsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+             xmlns:local="clr-namespace:StartCheckerApp.Views"
+             Title="Nastavení">
+
+    <VerticalStackLayout Padding="20">
+        <Button Text="Načíst USB zařízení" Clicked="OnDetectUsbClicked" />
+        <Label x:Name="UsbDataLabel" Text="Zatím žádná data" LineBreakMode="WordWrap" />
     </VerticalStackLayout>
+
+
 </ContentPage>

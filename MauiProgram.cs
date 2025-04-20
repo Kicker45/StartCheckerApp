@@ -28,6 +28,7 @@ namespace StartCheckerApp
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<CurrentMinutePage>();
 
+
             // 3) Inicializace lokální SQLite databáze
             //    Vytvoříme instanci SQLiteAsyncConnection a přidáme ji jako singleton
             var database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
@@ -52,6 +53,7 @@ namespace StartCheckerApp
             });
 
             // 6) Přidání dalších služeb
+            builder.Services.AddSingleton<UsbCommunicationService>();
             builder.Services.AddSingleton<RaceDataService>();
             builder.Services.AddSingleton<StatusToColorConverter>();
 
@@ -63,6 +65,9 @@ namespace StartCheckerApp
                 var dbConn = sp.GetRequiredService<SQLiteAsyncConnection>();
                 return new App(mainPage, dbConn);
             });
+
+
+
 
             // 8) Logging v debug modu
 #if DEBUG

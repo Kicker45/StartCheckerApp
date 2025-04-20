@@ -14,7 +14,7 @@ namespace StartCheckerApp.Views
             _serviceProvider = serviceProvider;
             _raceDataService = raceDataService;
             _runnerDatabase = runnerDatabase;
-            
+
         }
 
         private async void OnNavigateToGetStartlist(object sender, EventArgs e)
@@ -54,7 +54,8 @@ namespace StartCheckerApp.Views
 
         private async void OnNavigateToSettings(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new SettingsPage());
+            var siService = _serviceProvider.GetRequiredService<UsbCommunicationService>();
+            await Navigation.PushAsync(new SettingsPage(siService));
         }
 
     }
