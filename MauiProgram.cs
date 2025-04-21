@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using StartCheckerApp.Views;
-using StartCheckerApp.Services;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.Logging;
 using SQLite;
+using StartCheckerApp.Services;
+using StartCheckerApp.Views;
 
 namespace StartCheckerApp
 {
@@ -57,7 +57,7 @@ namespace StartCheckerApp
             builder.Services.AddSingleton<IMessageService, StartCheckerApp.Platforms.Android.MessageService>();
             builder.Services.AddSingleton<UsbCommunicationService>();
 #elif WINDOWS
-    builder.Services.AddSingleton<IMessageService, StartCheckerApp.Platforms.Windows.MessageService>();
+            builder.Services.AddSingleton<IMessageService, StartCheckerApp.Platforms.Windows.MessageService>();
 #endif
 
 

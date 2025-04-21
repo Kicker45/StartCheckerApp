@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.Messaging;
 using StartCheckerApp.Messages;
 using StartCheckerApp.Models;

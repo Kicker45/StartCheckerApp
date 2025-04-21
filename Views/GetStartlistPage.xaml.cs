@@ -1,6 +1,6 @@
-using System.Text.Json;
 using StartCheckerApp.Models;
 using StartCheckerApp.Services;
+using System.Text.Json;
 
 namespace StartCheckerApp.Views
 {

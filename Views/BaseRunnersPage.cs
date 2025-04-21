@@ -1,7 +1,6 @@
 ﻿using StartCheckerApp.Models;
 using StartCheckerApp.Services;
 using System.Collections.ObjectModel;
-using CommunityToolkit.Maui.Views;
 
 
 namespace StartCheckerApp.Views

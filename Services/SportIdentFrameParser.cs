@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StartCheckerApp.Services
+﻿namespace StartCheckerApp.Services
 {
     public enum SiCommand : byte
     {

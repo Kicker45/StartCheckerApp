@@ -1,6 +1,6 @@
 ﻿using SQLite;
-using StartCheckerApp.Views;
 using StartCheckerApp.Models;
+using StartCheckerApp.Views;
 
 namespace StartCheckerApp
 {

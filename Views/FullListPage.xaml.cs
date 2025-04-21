@@ -1,12 +1,8 @@
+using CommunityToolkit.Mvvm.Messaging;
+using StartCheckerApp.Messages;
 using StartCheckerApp.Models;
-using CommunityToolkit.Maui.Views;
-using System.ComponentModel;
 using StartCheckerApp.Services;
 using System.Collections.ObjectModel;
-using System.Text.Json;
-using System.Text;
-using StartCheckerApp.Messages;
-using CommunityToolkit.Mvvm.Messaging;
 
 namespace StartCheckerApp.Views
 {

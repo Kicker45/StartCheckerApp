@@ -1,8 +1,5 @@
 ﻿using SQLite;
 using StartCheckerApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace StartCheckerApp.Services
 {

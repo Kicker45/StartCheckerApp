@@ -1,6 +1,4 @@
 ﻿using StartCheckerApp.Services;
-using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
 
 namespace StartCheckerApp.Views
 {

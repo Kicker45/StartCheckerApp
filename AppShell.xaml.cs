@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StartCheckerApp
+﻿namespace StartCheckerApp
 {
     public partial class AppShell : Shell
     {
