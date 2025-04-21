@@ -54,7 +54,7 @@ namespace StartCheckerApp.Views
                 }
 
                 // Pokud závodník neexistuje – pøidáme ho do pøíslušné minuty
-                var groupKey = updated.StartTime.ToString("HH:mm");
+                var groupKey = updated.StartTime.ToLocalTime().ToString("HH:mm");
                 var targetGroup = _allGroupedRunners.FirstOrDefault(g => g.StartTime == groupKey);
 
                 if (targetGroup != null)

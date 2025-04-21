@@ -10,6 +10,7 @@ namespace StartCheckerApp.Services
     {
         private readonly SQLiteAsyncConnection _database;
 
+
         public RunnerDatabaseService(SQLiteAsyncConnection database)
         {
             _database = database;
@@ -51,5 +52,15 @@ namespace StartCheckerApp.Services
         {
             await _database.DeleteAllAsync<Runner>();
         }
+        public async Task CreateIndexOnStartMinuteAsync()
+        {
+            await _database.ExecuteAsync("CREATE INDEX IF NOT EXISTS idx_runners_startminute ON Runner(StartTime);");
+        }
+        public async Task<List<Runner>> GetRunnersOrderedByStartMinuteAsync()
+        {
+            return await _database.QueryAsync<Runner>("SELECT * FROM Runner ORDER BY StartTime");
+        }
+
+
     }
 }

@@ -115,7 +115,7 @@ namespace StartCheckerApp.Models
         public string FullName => $"{FirstName} {Surname}";
 
         [JsonIgnore]
-        public string StartMinute => StartTime.ToString("HH:mm");
+        public string StartMinute => StartTime.ToLocalTime().ToString("HH:mm");
 
         [JsonPropertyName("lastUpdatedAt")]
         private DateTime _LastUpdatedAt;

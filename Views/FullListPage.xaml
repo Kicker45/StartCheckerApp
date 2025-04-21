@@ -70,8 +70,7 @@
                     </CollectionView.GroupHeaderTemplate>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Padding="5" Margin="2"
-                                    BackgroundColor="{Binding ComputedStatus, Converter={StaticResource StatusToColorConverter}}">
+                            <Border Padding="5" Margin="2" >
                                 <Grid ColumnDefinitions="Auto,*,Auto,Auto" HorizontalOptions="Fill">
 
                                     <!-- Sloupec 1: SI Číslo -->

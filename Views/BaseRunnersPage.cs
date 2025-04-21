@@ -32,7 +32,7 @@ namespace StartCheckerApp.Views
             var filtered = filter != null ? allRunners.Where(filter).ToList() : allRunners;
 
             var grouped = await Task.Run(() =>
-                filtered.OrderBy(r => r.StartTime.ToLocalTime())
+                filtered.OrderBy(r => r.StartTime)
                         .GroupBy(r => r.StartMinute)
                         .Select(g => new RunnerGroup(g.Key, g))
                         .ToList());

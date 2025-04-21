@@ -151,6 +151,9 @@ namespace StartCheckerApp
                 }
             }
 
+            await _runnerDatabase.GetRunnersOrderedByStartMinuteAsync();
+            await _runnerDatabase.CreateIndexOnStartMinuteAsync();
+
             LastSyncTime = DateTime.UtcNow; // Aktualizace času poslední synchronizace
         }
 

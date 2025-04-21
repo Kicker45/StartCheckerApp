@@ -18,18 +18,18 @@ namespace StartCheckerApp.Views
         protected override CollectionView RunnersCollectionView => RunnersList;
 
         public FullListPage(RaceDataService raceDataService, HttpClient httpClient, RunnerDatabaseService runnerDatabase)
-            : base(raceDataService, httpClient, runnerDatabase)
+           : base(raceDataService, httpClient, runnerDatabase)
         {
             InitializeComponent();
-            LoadAllRunnersAsync().ConfigureAwait(false);
+            _ = LoadAllRunnersAsync(); // Fix for CS4014 and VSTHRD110: Explicitly discard the task to indicate intentional non-awaiting.  
             UpdateTimeLoop();
 
-            // Registrace zprávy – pouze jednou v konstruktoru
+            // Registrace zprávy – pouze jednou v konstruktoru  
             WeakReferenceMessenger.Default.Register<RunnerUpdatedMessage>(this, (r, message) =>
             {
                 var updated = message.Runner;
 
-                // Zkusíme najít závodníka ve skupinách
+                // Zkusíme najít závodníka ve skupinách  
                 foreach (var group in RunnerGroups)
                 {
                     var runner = group.FirstOrDefault(r => r.ID == updated.ID);
@@ -47,12 +47,12 @@ namespace StartCheckerApp.Views
                         runner.StartPassage = updated.StartPassage;
                         runner.LastUpdatedAt = updated.LastUpdatedAt;
 
-                        runner.OnPropertyChanged(null); // obnoví zobrazení
+                        runner.OnPropertyChanged(null); // obnoví zobrazení  
                         return;
                     }
                 }
 
-                // Pokud závodník ve skupinách není – pøidáme ho jako nový
+                // Pokud závodník ve skupinách není – pøidáme ho jako nový  
                 var key = updated.StartMinute;
                 var existingGroup = RunnerGroups.FirstOrDefault(g => g.StartTime == key);
 
@@ -147,11 +147,11 @@ namespace StartCheckerApp.Views
         {
             string query = e.NewTextValue?.ToLower().Trim();
 
-            if (string.IsNullOrEmpty(query))
-            {
-                await LoadAllRunnersAsync();
-                return;
-            }
+            //if (string.IsNullOrEmpty(query))
+            //{
+            //    await LoadAllRunnersAsync();
+            //    return;
+            //}
 
             var runners = await _runnerDatabase.GetRunnersAsync();
 
@@ -163,7 +163,7 @@ namespace StartCheckerApp.Views
                     (r.Category?.ToLower().Contains(query) ?? false) ||
                     (r.RegistrationNumber?.ToLower().Contains(query) ?? false) ||
                     r.SINumber.ToString().Contains(query) ||
-                    r.StartTime.ToString("HH:mm:ss").Contains(query))
+                    r.StartTime.ToLocalTime().ToString("HH:mm:ss").Contains(query))
                 .ToList();
 
             var grouped = filtered
@@ -178,7 +178,7 @@ namespace StartCheckerApp.Views
         private void OnClearSearchClicked(object sender, EventArgs e)
         {
             SearchEntry.Text = string.Empty;
-            LoadAllRunnersAsync().ConfigureAwait(false);
+            _ = LoadAllRunnersAsync();
         }
     }
 }
