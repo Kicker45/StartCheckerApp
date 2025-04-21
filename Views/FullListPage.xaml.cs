@@ -5,6 +5,8 @@ using StartCheckerApp.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text;
+using StartCheckerApp.Messages;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace StartCheckerApp.Views
 {
@@ -12,10 +14,7 @@ namespace StartCheckerApp.Views
     {
         private bool _isRunning = true;
 
-        // Implementace TimeLabel pro tuto stránku
         protected override Label TimeLabel => TimeLabelControl;
-
-        // Implementace CollectionView pro tuto stránku
         protected override CollectionView RunnersCollectionView => RunnersList;
 
         public FullListPage(RaceDataService raceDataService, HttpClient httpClient, RunnerDatabaseService runnerDatabase)
@@ -24,6 +23,48 @@ namespace StartCheckerApp.Views
             InitializeComponent();
             LoadAllRunnersAsync().ConfigureAwait(false);
             UpdateTimeLoop();
+
+            // Registrace zprávy – pouze jednou v konstruktoru
+            WeakReferenceMessenger.Default.Register<RunnerUpdatedMessage>(this, (r, message) =>
+            {
+                var updated = message.Runner;
+
+                // Zkusíme najít závodníka ve skupinách
+                foreach (var group in RunnerGroups)
+                {
+                    var runner = group.FirstOrDefault(r => r.ID == updated.ID);
+                    if (runner != null)
+                    {
+                        runner.FirstName = updated.FirstName;
+                        runner.Surname = updated.Surname;
+                        runner.Category = updated.Category;
+                        runner.RegistrationNumber = updated.RegistrationNumber;
+                        runner.SINumber = updated.SINumber;
+                        runner.StartTime = updated.StartTime;
+                        runner.DNS = updated.DNS;
+                        runner.Started = updated.Started;
+                        runner.StartFlag = updated.StartFlag;
+                        runner.StartPassage = updated.StartPassage;
+                        runner.LastUpdatedAt = updated.LastUpdatedAt;
+
+                        runner.OnPropertyChanged(null); // obnoví zobrazení
+                        return;
+                    }
+                }
+
+                // Pokud závodník ve skupinách není – pøidáme ho jako nový
+                var key = updated.StartMinute;
+                var existingGroup = RunnerGroups.FirstOrDefault(g => g.StartTime == key);
+
+                if (existingGroup != null)
+                {
+                    existingGroup.Add(updated);
+                }
+                else
+                {
+                    RunnerGroups.Add(new RunnerGroup(key, new List<Runner> { updated }));
+                }
+            });
         }
 
         private async void UpdateTimeLoop()
@@ -39,6 +80,15 @@ namespace StartCheckerApp.Views
         {
             base.OnDisappearing();
             _isRunning = false;
+            WeakReferenceMessenger.Default.Unregister<RunnerUpdatedMessage>(this);
+        }
+
+        protected override void OnNavigatedTo(NavigatedToEventArgs args)
+        {
+            base.OnNavigatedTo(args);
+            _isRunning = true;
+            UpdateTimeLoop();
+            _ = LoadAllRunnersAsync();
         }
 
         private async void OnRunnerClicked(object sender, SelectionChangedEventArgs e)
@@ -57,10 +107,9 @@ namespace StartCheckerApp.Views
 
         private async void OnEditRunnerClicked(object sender, EventArgs e)
         {
-            var button = sender as Button;
-            if (button?.BindingContext is Runner selectedRunner)
+            if (sender is Button button && button.BindingContext is Runner selectedRunner)
             {
-                await HandleRunnerPopupAsync(selectedRunner);
+                await Navigation.PushAsync(new RunnerDetailPage(selectedRunner, _httpClient, _raceDataService, _runnerDatabase));
             }
         }
 
@@ -80,7 +129,7 @@ namespace StartCheckerApp.Views
                 RaceId = _raceDataService.RaceId
             };
 
-            await HandleRunnerPopupAsync(newRunner);
+            await Navigation.PushAsync(new RunnerDetailPage(newRunner, _httpClient, _raceDataService, _runnerDatabase));
         }
 
         private async void OnSyncClicked(object sender, EventArgs e)

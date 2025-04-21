@@ -1,0 +1,62 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="StartCheckerApp.Views.RunnerDetailPage"
+             Title="Úprava závodníka">
+    <ScrollView>
+        <VerticalStackLayout Padding="10,0,10,0" BackgroundColor="White">
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                Text="Uložit"
+                FontSize="20"
+                BackgroundColor="Green"
+                Clicked="OnSaveClicked"
+                Padding="10,20"/>
+
+                <Button Grid.Column="1"
+                Text="DNS"
+                FontSize="20"
+                BackgroundColor="Orange"
+                Clicked="OnDNSClicked"
+                Padding="10,20"/>
+
+                <Button Grid.Column="2"
+                Text="Zrušit"
+                FontSize="20"
+                BackgroundColor="Red"
+                Clicked="OnCancelClicked"
+                Padding="10,20"/>
+            </Grid>
+
+            <Label x:Name="FullNameLabel" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" Padding="10"/>
+
+            <Label Text="Číslo SI čipu:" FontSize="24" FontAttributes="Bold"/>
+            <Entry x:Name="SINumberEntry" FontSize="24" Keyboard="Numeric" Placeholder="Zadejte číslo SI čipu">
+                <Entry.Behaviors>
+                    <toolkit:SelectAllTextBehavior />
+                </Entry.Behaviors>
+            </Entry>
+
+            <Label Text="Kategorie:" FontSize="24" FontAttributes="Bold"/>
+            <Entry x:Name="CategoryEntry" FontSize="24"  />
+
+            <!-- Nové pole pro datum -->
+            <Label Text="Startovní den:" FontSize="24" FontAttributes="Bold"/>
+            <DatePicker x:Name="StartDatePicker" Format="dd.MM.yyyy" FontSize="24"/>
+
+            <!-- Nové pole pro čas -->
+            <Label Text="Startovní čas:" FontSize="24" FontAttributes="Bold"/>
+            <TimePicker x:Name="StartTimePicker" Format="HH:mm:ss" FontSize="24"/>
+
+            <Label Text="Registrační číslo:" FontSize="24" FontAttributes="Bold"/>
+            <Entry x:Name="RegistrationNumberEntry" FontSize="24"  />
+
+            <Label Text="Křestní jméno:" FontSize="24" FontAttributes="Bold"/>
+            <Entry x:Name="FirstNameEntry" FontSize="24"  />
+
+            <Label Text="Příjmení:" FontSize="24" FontAttributes="Bold"/>
+            <Entry x:Name="SurnameEntry" FontSize="24"  />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -23,7 +23,7 @@ namespace StartCheckerApp
             // 2) Registrace stránek (NavigationPage a další)
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddTransient<GetStartlistPage>();
-            builder.Services.AddTransient<RunnerDetailPopup>();
+            builder.Services.AddTransient<RunnerDetailPage>();
             builder.Services.AddTransient<FullListPage>();
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<CurrentMinutePage>();
@@ -53,7 +53,14 @@ namespace StartCheckerApp
             });
 
             // 6) Přidání dalších služeb
+#if ANDROID
+            builder.Services.AddSingleton<IMessageService, StartCheckerApp.Platforms.Android.MessageService>();
             builder.Services.AddSingleton<UsbCommunicationService>();
+#elif WINDOWS
+    builder.Services.AddSingleton<IMessageService, StartCheckerApp.Platforms.Windows.MessageService>();
+#endif
+
+
             builder.Services.AddSingleton<RaceDataService>();
             builder.Services.AddSingleton<StatusToColorConverter>();
 
@@ -65,9 +72,6 @@ namespace StartCheckerApp
                 var dbConn = sp.GetRequiredService<SQLiteAsyncConnection>();
                 return new App(mainPage, dbConn);
             });
-
-
-
 
             // 8) Logging v debug modu
 #if DEBUG

@@ -40,6 +40,10 @@
 		<PackageIcon>StartCheckerIcon.png</PackageIcon>
 	</PropertyGroup>
 
+	<PropertyGroup>
+	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.26100.0</TargetFrameworks>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -60,6 +64,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="11.1.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Iof.DataStandard.Parser" Version="1.4.1" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
@@ -69,8 +74,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\RunnerDetailPopup.xaml.cs">
-	    <DependentUpon>RunnerDetailPopup.xaml</DependentUpon>
+	  <Compile Update="Views\RunnerDetailPage.xaml.cs">
+	    <DependentUpon>RunnerDetailPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

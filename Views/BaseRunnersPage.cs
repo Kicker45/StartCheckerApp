@@ -2,7 +2,7 @@
 using StartCheckerApp.Services;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Maui.Views;
- 
+
 
 namespace StartCheckerApp.Views
 {
@@ -27,18 +27,23 @@ namespace StartCheckerApp.Views
 
         protected async Task LoadAllRunnersAsync(Func<Runner, bool> filter = null)
         {
-            var allRunners = await _runnerDatabase.GetRunnersAsync();
+            var allRunners = await Task.Run(() => _runnerDatabase.GetRunnersAsync().Result);
+
             var filtered = filter != null ? allRunners.Where(filter).ToList() : allRunners;
 
-            var grouped = filtered
-                .OrderBy(r => r.StartTime)
-                .GroupBy(r => r.StartMinute)
-                .Select(g => new RunnerGroup(g.Key, g))
-                .ToList();
+            var grouped = await Task.Run(() =>
+                filtered.OrderBy(r => r.StartTime.ToLocalTime())
+                        .GroupBy(r => r.StartMinute)
+                        .Select(g => new RunnerGroup(g.Key, g))
+                        .ToList());
 
-            RunnerGroups = new ObservableCollection<RunnerGroup>(grouped);
-            RunnersCollectionView.ItemsSource = RunnerGroups;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                RunnerGroups = new ObservableCollection<RunnerGroup>(grouped);
+                RunnersCollectionView.ItemsSource = RunnerGroups;
+            });
         }
+
 
         protected async Task HandleRunnerClickAsync(Runner selectedRunner)
         {
@@ -79,15 +84,11 @@ namespace StartCheckerApp.Views
             await _runnerDatabase.UpdateRunnerAsync(selectedRunner);
         }
 
-        protected async Task HandleRunnerPopupAsync(Runner runner)
+        protected async Task HandleRunnerDetailPageAsync(Runner runner)
         {
-            var popup = new RunnerDetailPopup(runner, _httpClient, _raceDataService, _runnerDatabase);
-            var responseCode = await this.ShowPopupAsync(popup) as int?;
-            if (responseCode == 200)
-            {
-                await LoadAllRunnersAsync();
-            }
+            await Navigation.PushAsync(new RunnerDetailPage(runner, _httpClient, _raceDataService, _runnerDatabase));
         }
+
 
         protected async Task SyncWithServerAsync()
         {

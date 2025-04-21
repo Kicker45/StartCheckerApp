@@ -1,13 +1,34 @@
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StartCheckerApp.Views.SettingsPage"
-             xmlns:local="clr-namespace:StartCheckerApp.Views"
-             Title="Nastavení">
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="StartCheckerApp.Views.SettingsPage"
+    Title="Nastavení">
 
-    <VerticalStackLayout Padding="20">
-        <Button Text="Načíst USB zařízení" Clicked="OnDetectUsbClicked" />
-        <Label x:Name="UsbDataLabel" Text="Zatím žádná data" LineBreakMode="WordWrap" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <Label Text="Název závodu:" FontSize="20"/>
+            <Entry x:Name="RaceNameEntry" Placeholder="Zadejte název závodu" FontSize="20"/>
+
+            <Label Text="Datum a čas startu:" FontSize="20"/>
+            <DatePicker x:Name="RaceDatePicker" FontSize="20"/>
+            <TimePicker x:Name="RaceTimePicker" FontSize="20"/>
+
+            <Button Text="Vytvořit závod" Clicked="OnCreateRaceClicked" BackgroundColor="LightGreen" FontAttributes="Bold" FontSize="20"/>
+            <Label Text="Zadejte ID závodu, který chcete vytvořit (ideálně ORIS ID):" FontSize="20"/>
+            <Entry x:Name="ExistingRaceIdEntry"
+       Placeholder="Např. 123"
+       Keyboard="Numeric"
+       FontSize="20"/>
+
+            <Button Text="Nahrát startovní listinu a vytvořit závod" Clicked="OnUploadStartlistClicked" BackgroundColor="LightBlue" FontAttributes="Bold" FontSize="20"/>
 
 
+            <Label Text="USB zařízení (pouze Android):" FontSize="20"/>
+            <Button Text="Načíst USB zařízení" Clicked="OnDetectUsbClicked" />
+            <Label x:Name="UsbDataLabel" Text="Zatím žádná data" LineBreakMode="WordWrap" FontSize="16"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

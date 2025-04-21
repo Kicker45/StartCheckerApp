@@ -11,6 +11,7 @@ namespace StartCheckerApp
         public App(MainPage mainPage, SQLiteAsyncConnection db)
         {
             InitializeComponent();
+            App.Current.UserAppTheme = AppTheme.Light; // ⬅️ Nutné pro globální světlé zobrazení
             MainPage = new NavigationPage(mainPage);
             _db = db;
         }

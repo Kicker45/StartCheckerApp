@@ -44,9 +44,9 @@
                         SelectionChanged="OnRunnerClicked">
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate>
-                    <Grid x:Name="HeaderGrid" BackgroundColor="Black" Padding="5">
+                    <Grid x:Name="HeaderGrid" BackgroundColor="Black" Padding="5" MinimumHeightRequest="30">
                         <!-- Tlačítka pro přechod na předchozí a následující minutu -->
-                        <Button Text="◀" FontSize="25" Clicked="OnPreviousMinuteClicked" HorizontalOptions="Start"/>
+                        <Button Text="◀" FontSize="25" Clicked="OnPreviousMinuteClicked" HorizontalOptions="Start" MinimumWidthRequest="100"/>
                         <Label x:Name="StartTimeText"
                                Text="{Binding StartTime}"
                                FontSize="40"
@@ -54,7 +54,7 @@
                                FontAttributes="Bold"
                                VerticalOptions="Center"
                                HorizontalOptions="Center"/>
-                        <Button Text="▶" FontSize="25" Clicked="OnNextMinuteClicked" HorizontalOptions="End"/>
+                        <Button Text="▶" FontSize="25" Clicked="OnNextMinuteClicked" HorizontalOptions="End" MinimumWidthRequest="100"/>
                     </Grid>
                 </DataTemplate>
             </CollectionView.GroupHeaderTemplate>

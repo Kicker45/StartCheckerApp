@@ -2,6 +2,8 @@ using StartCheckerApp.Models;
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using StartCheckerApp.Services;
+using StartCheckerApp.Messages;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace StartCheckerApp.Views
 {
@@ -12,10 +14,7 @@ namespace StartCheckerApp.Views
         private int _currentMinuteIndex = 0;
         private bool _isRunning = true;
 
-        // Implementace TimeLabel pro tuto stránku
         protected override Label TimeLabel => TimeLabelControl;
-
-        // Implementace CollectionView pro tuto stránku
         protected override CollectionView RunnersCollectionView => RunnersList;
 
         public CurrentMinutePage(RaceDataService raceDataService, HttpClient httpClient, RunnerDatabaseService runnerDatabase)
@@ -24,6 +23,52 @@ namespace StartCheckerApp.Views
             InitializeComponent();
             LoadGroupedRunners();
             UpdateTimeLoop();
+
+            // Registrace zprávy pouze jednou
+            WeakReferenceMessenger.Default.Register<RunnerUpdatedMessage>(this, (r, message) =>
+            {
+                var updated = message.Runner;
+
+                // Zkusit najít a aktualizovat závodníka ve všech skupinách
+                foreach (var group in _allGroupedRunners)
+                {
+                    var runner = group.FirstOrDefault(r => r.ID == updated.ID);
+                    if (runner != null)
+                    {
+                        runner.FirstName = updated.FirstName;
+                        runner.Surname = updated.Surname;
+                        runner.Category = updated.Category;
+                        runner.RegistrationNumber = updated.RegistrationNumber;
+                        runner.SINumber = updated.SINumber;
+                        runner.StartTime = updated.StartTime;
+                        runner.DNS = updated.DNS;
+                        runner.Started = updated.Started;
+                        runner.StartFlag = updated.StartFlag;
+                        runner.StartPassage = updated.StartPassage;
+                        runner.LastUpdatedAt = updated.LastUpdatedAt;
+
+                        runner.OnPropertyChanged(null);
+                        UpdateToCurrentMinute();
+                        return;
+                    }
+                }
+
+                // Pokud závodník neexistuje – pøidáme ho do pøíslušné minuty
+                var groupKey = updated.StartTime.ToString("HH:mm");
+                var targetGroup = _allGroupedRunners.FirstOrDefault(g => g.StartTime == groupKey);
+
+                if (targetGroup != null)
+                {
+                    targetGroup.Add(updated);
+                }
+                else
+                {
+                    _allGroupedRunners.Add(new RunnerGroup(groupKey, new List<Runner> { updated }));
+                    _minuteGroups.Add(groupKey);
+                }
+
+                UpdateToCurrentMinute();
+            });
         }
 
         private async void UpdateTimeLoop()
@@ -39,13 +84,22 @@ namespace StartCheckerApp.Views
         {
             base.OnDisappearing();
             _isRunning = false;
+            WeakReferenceMessenger.Default.Unregister<RunnerUpdatedMessage>(this);
         }
+        protected override void OnNavigatedTo(NavigatedToEventArgs args)
+        {
+            base.OnNavigatedTo(args);
+            _isRunning = true;
+            UpdateTimeLoop();
+
+        }
+
         private async void LoadGroupedRunners()
         {
             var runners = await RunnerDatabase.GetRunnersAsync();
 
             _allGroupedRunners = [.. runners.OrderBy(r => r.StartTime)
-                       .GroupBy(r => r.StartTime.ToString("HH:mm"))
+                       .GroupBy(r => r.StartTime.ToLocalTime().ToString("HH:mm"))
                        .Select(g => new RunnerGroup(g.Key, g.ToList()))];
 
             _minuteGroups.Clear();
@@ -96,12 +150,12 @@ namespace StartCheckerApp.Views
 
         private async void OnEditRunnerClicked(object sender, EventArgs e)
         {
-            var button = sender as Button;
-            if (button?.BindingContext is Runner selectedRunner)
+            if (sender is Button button && button.BindingContext is Runner selectedRunner)
             {
-                await HandleRunnerPopupAsync(selectedRunner);
+                await Navigation.PushAsync(new RunnerDetailPage(selectedRunner, _httpClient, _raceDataService, _runnerDatabase));
             }
         }
+
         private async void OnAddRunnerClicked(object sender, EventArgs e)
         {
             var newRunner = new Runner
@@ -118,7 +172,7 @@ namespace StartCheckerApp.Views
                 RaceId = _raceDataService.RaceId
             };
 
-            await HandleRunnerPopupAsync(newRunner);
+            await Navigation.PushAsync(new RunnerDetailPage(newRunner, _httpClient, _raceDataService, _runnerDatabase));
         }
 
         private async void OnSyncClicked(object sender, EventArgs e)
@@ -151,7 +205,5 @@ namespace StartCheckerApp.Views
                 SetCurrentMinuteGroup(_minuteGroups[_currentMinuteIndex]);
             }
         }
-
-
     }
 }

@@ -9,13 +9,15 @@ namespace StartCheckerApp.Views
         private readonly HttpClient _httpClient;
         private readonly RaceDataService _raceDataService;
         private readonly RunnerDatabaseService _runnerDatabaseService;
+        private readonly IMessageService _messageService;
 
-        public GetStartlistPage(HttpClient httpClient, RaceDataService raceDataService, RunnerDatabaseService runnerDatabaseService)
+        public GetStartlistPage(HttpClient httpClient, RaceDataService raceDataService, RunnerDatabaseService runnerDatabaseService, IMessageService messageService)
         {
             InitializeComponent();
             _httpClient = httpClient;
             _raceDataService = raceDataService;
             _runnerDatabaseService = runnerDatabaseService;
+            _messageService = messageService;
         }
 
         private async void OnLoadStartListClicked(object sender, EventArgs e)
@@ -24,7 +26,7 @@ namespace StartCheckerApp.Views
 
             if (string.IsNullOrWhiteSpace(raceId))
             {
-                await DisplayAlert("Chyba", "Zadejte ID závodu!", "OK");
+                await _messageService.ShowMessageAsync("Zadejte ID závodu!");
                 return;
             }
 
@@ -43,40 +45,36 @@ namespace StartCheckerApp.Views
 
                     if (raceData.StartList.Count > 0)
                     {
-                        // Pøed vloením novıch dat smaeme existující závodníky v SQLite
-                        await _runnerDatabaseService.DeleteAllRunnersAsync(); 
-
-                        // Nastavení RaceId v RaceDataService pro synchronizaci
+                        await _runnerDatabaseService.DeleteAllRunnersAsync();
                         _raceDataService.SetRace(raceData.RaceId, raceData.StartList);
-
-                        // Uloit do SQLite místo pøímého pouití
                         await _raceDataService.SaveStartListToDatabase(raceData.RaceId, raceData.StartList);
+
+                        await _messageService.ShowMessageAsync($"Závod: {raceData.RaceName}, Poèet závodníkù: {raceData.StartList.Count}");
 
                         LoadingIndicator.IsRunning = false;
                         LoadingIndicator.IsVisible = false;
-                        await DisplayAlert("Úspìch", $"Závod: {raceData.RaceName}, Poèet závodníkù: {raceData.StartList.Count}", "OK");
+
                         await Navigation.PopAsync();
-                        // Navigace na FullListPage (kterı u pracuje se SQLite)
                         await Navigation.PushAsync(new FullListPage(_raceDataService, _httpClient, _runnerDatabaseService));
                     }
                     else
                     {
-                        await DisplayAlert("Chyba", $"Závod ({raceData.RaceName}) nemá ádné závodníky k zobrazení", "OK");
+                        await _messageService.ShowMessageAsync($"Závod ({raceData.RaceName}) nemá ádné závodníky k zobrazení");
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Chyba", $"Chyba pøi komunikaci se serverem. Status: {response.StatusCode}", "OK");
+                    await _messageService.ShowMessageAsync($"Chyba pøi komunikaci se serverem. Status: {response.StatusCode}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                await DisplayAlert("Síová chyba", $"Chyba HTTP: {ex.Message}", "OK");
+                await _messageService.ShowMessageAsync($"Chyba HTTP: {ex.Message}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Obecná chyba: {ex.Message}");
-                await DisplayAlert("Chyba pøipojení", $"Obecná chyba: {ex.Message}", "OK");
+                await _messageService.ShowMessageAsync($"Chyba: {ex.Message}");
             }
             finally
             {
@@ -84,6 +82,5 @@ namespace StartCheckerApp.Views
                 LoadingIndicator.IsVisible = false;
             }
         }
-
     }
 }

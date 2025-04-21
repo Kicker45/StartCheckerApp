@@ -18,6 +18,57 @@ namespace StartCheckerApp
             _httpClient = httpClient;
             _runnerDatabase = runnerDatabase;
         }
+        public async Task<int?> AddRaceAsync(string raceName, DateTime raceStart)
+        {
+            try
+            {
+                string url = $"add-race?RaceName={Uri.EscapeDataString(raceName)}&RaceStart={raceStart.ToUniversalTime():O}";
+                HttpResponseMessage response = await _httpClient.PostAsync(url, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseJson = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<Dictionary<string, object>>(responseJson);
+
+                    if (result != null && result.TryGetValue("raceId", out var raceIdObj))
+                    {
+                        return Convert.ToInt32(raceIdObj);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"AddRaceAsync exception: {ex.Message}");
+            }
+
+            return null;
+        }
+
+        public async Task<bool> UploadStartlistAsync(int raceId, FileResult file)
+        {
+            try
+            {
+                using var content = new MultipartFormDataContent();
+                using var stream = await file.OpenReadAsync();
+
+                var fileContent = new StreamContent(stream);
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/xml");
+
+                content.Add(fileContent, "file", file.FileName);
+                content.Add(new StringContent(raceId.ToString()), "raceID");
+
+                var response = await _httpClient.PostAsync("upload-startlist", content);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UploadStartlistAsync exception: {ex.Message}");
+                return false;
+            }
+        }
+
+
         public void SetRace(int raceId, List<Runner> runners)
         {
             RaceId = raceId;
