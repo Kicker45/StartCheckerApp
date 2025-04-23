@@ -80,6 +80,7 @@ namespace StartCheckerApp.Views
             }
 
             selectedRunner.LastUpdatedAt = DateTime.UtcNow;
+            selectedRunner.OnPropertyChanged(nameof(Runner.ComputedStatus));
             await _runnerDatabase.UpdateRunnerAsync(selectedRunner);
         }
 

@@ -13,18 +13,20 @@
                    HorizontalOptions="Start" VerticalOptions="Center"
                    Grid.Column="0"/>
             <BoxView Grid.Column="1" WidthRequest="1"/>
-            <Button Text="Sync" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="0"
+            <Button Text="Sync" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="10,0,10,0" Margin="0,0,20,0"
                     Grid.Column="2"
                     BackgroundColor="LightBlue"
                     HorizontalOptions="End"
                     VerticalOptions="Center"
-                    Clicked="OnSyncClicked"/>
-            <Button Text="+" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="0"
-                    Grid.Column="3"
-                    BackgroundColor="#4AF94F"
-                    HorizontalOptions="End"
-                    VerticalOptions="Center"
-                    Clicked="OnAddRunnerClicked"/>
+                    Clicked="OnSyncClicked"
+                    />
+            <Button Text="+" FontSize="35" TextColor="Black" FontAttributes="Bold" Padding="15,0,15,0"
+                Grid.Column="3"
+                BackgroundColor="#4AF94F" 
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                Clicked="OnAddRunnerClicked"
+                />
         </Grid>
 
         <!-- Indikátor načítání -->
