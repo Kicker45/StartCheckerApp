@@ -71,7 +71,7 @@ public partial class RunnerDetailPage : ContentPage
             StartTimePicker.Time.Seconds
         );
 
-        _runner.StartTime = DateTime.SpecifyKind(selectedDateTime, DateTimeKind.Utc);
+        _runner.StartTime = DateTime.SpecifyKind(selectedDateTime, DateTimeKind.Local).ToUniversalTime();
 
         if (_runner.ID == 0)
         {
