@@ -78,9 +78,9 @@
                                 <Label Text="{Binding Category}" FontSize="16" TextColor="Black" HorizontalOptions="End" FontAttributes="Bold"/>
                                 <Label Text="{Binding RegistrationNumber}" FontSize="16" TextColor="Black" FontAttributes="Bold"/>
                             </StackLayout>
-                            <!-- Tlačítko pro editaci -->
-                            <Button Grid.Column="3" Text="✏️" FontSize="20" BackgroundColor="Transparent"
-                                    Clicked="OnEditRunnerClicked" HorizontalOptions="End" Padding="0"/>
+                            <!-- Sloupec 4: Editační tlačítko -->
+                            <Button Grid.Column="3" Text="✏️" FontSize="20" BackgroundColor="Transparent" BorderColor="Black" BorderWidth="1"
+                            Clicked="OnEditRunnerClicked" HorizontalOptions="End" Padding="5" Margin="5"/>
                         </Grid>
                     </Border>
                 </DataTemplate>
