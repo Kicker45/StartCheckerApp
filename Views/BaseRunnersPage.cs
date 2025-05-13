@@ -1,4 +1,10 @@
-﻿using StartCheckerApp.Models;
+﻿//------------------------------------------------------------------------------
+// Název souboru: BaseRunnersPage.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje abstraktní základní třídu pro obě stránky zobrazující seznam závodníků (CurrentMinutePage, FullListPage).
+// Datum vytvoření: 1.2.2025
+//------------------------------------------------------------------------------
+using StartCheckerApp.Models;
 using StartCheckerApp.Services;
 using System.Collections.ObjectModel;
 
@@ -20,10 +26,19 @@ namespace StartCheckerApp.Views
             _runnerDatabase = runnerDatabase;
         }
 
+        // Abstraktní vlastnost pro CollectionView, která bude implementována v odvozených třídách.
         protected abstract CollectionView RunnersCollectionView { get; }
+
+        // Abstraktní vlastnost pro Label zobrazující čas, která bude implementována v odvozených třídách.
         protected abstract Label TimeLabel { get; }
+
+        // Získání instance RunnerDatabaseService.
         protected RunnerDatabaseService RunnerDatabase => _runnerDatabase;
 
+        /// <summary>
+        /// Načte všechny závodníky z databáze, aplikuje volitelný filtr a seskupí je podle startovní minuty.
+        /// </summary>
+        /// <param name="filter">Volitelný filtr pro závodníky.</param>
         protected async Task LoadAllRunnersAsync(Func<Runner, bool> filter = null)
         {
             var allRunners = await Task.Run(() => _runnerDatabase.GetRunnersAsync().Result);
@@ -43,7 +58,10 @@ namespace StartCheckerApp.Views
             });
         }
 
-
+        /// <summary>
+        /// Zpracuje kliknutí na závodníka a umožní změnu jeho stavu (např. označení jako odstartovaný).
+        /// </summary>
+        /// <param name="selectedRunner">Vybraný závodník.</param>
         protected async Task HandleRunnerClickAsync(Runner selectedRunner)
         {
             if (selectedRunner == null) return;
@@ -84,12 +102,18 @@ namespace StartCheckerApp.Views
             await _runnerDatabase.UpdateRunnerAsync(selectedRunner);
         }
 
+        /// <summary>
+        /// Otevře detailní stránku závodníka pro úpravy nebo zobrazení.
+        /// </summary>
+        /// <param name="runner">Závodník, jehož detail se má zobrazit.</param>
         protected async Task HandleRunnerDetailPageAsync(Runner runner)
         {
             await Navigation.PushAsync(new RunnerDetailPage(runner, _httpClient, _raceDataService, _runnerDatabase));
         }
 
-
+        /// <summary>
+        /// Synchronizuje data závodníků se serverem a znovu načte seznam závodníků.
+        /// </summary>
         protected async Task SyncWithServerAsync()
         {
             await _raceDataService.SyncRunnersWithServer();

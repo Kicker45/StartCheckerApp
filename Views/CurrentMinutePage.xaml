@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+     Název souboru: CurrentMinutePage.xaml
+     Autor: Jan Nechanický
+     Popis: Tento soubor definuje stránku pro zobrazení závodníků aktuální startovní minuty.
+     Datum vytvoření: 1.4.2025
+-->
+    
 <views:BaseRunnersPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"

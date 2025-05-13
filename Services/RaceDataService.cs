@@ -1,23 +1,35 @@
-﻿using StartCheckerApp.Models;
+﻿//------------------------------------------------------------------------------
+// Název souboru: RaceDataService.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje logiku pro správu dat o závodech, synchronizaci se serverem a práci s databází závodníků.
+// Datum vytvoření: 1.4.2025
+//------------------------------------------------------------------------------
+
+using StartCheckerApp.Models;
 using StartCheckerApp.Services;
 using System.Text;
 using System.Text.Json;
 
 namespace StartCheckerApp
 {
+    // Služba pro správu dat závodu a závodníků
     public class RaceDataService
     {
-        private readonly RunnerDatabaseService _runnerDatabase;
-        private readonly HttpClient _httpClient;
-        public int RaceId { get; private set; } // ID aktuálního závodu
-        public List<Runner> Runners { get; private set; } = new List<Runner>();
-        public DateTime LastSyncTime { get; internal set; }
+        private readonly RunnerDatabaseService _runnerDatabase;   // Služba pro práci s SQLite databází závodníků
+        private readonly HttpClient _httpClient;                 // HTTP klient pro komunikaci se serverem
+        public int RaceId { get; private set; }                  // ID aktuálního závodu
+        public List<Runner> Runners { get; private set; } = new List<Runner>(); // Seznam závodníků
+        public DateTime LastSyncTime { get; internal set; }      // Čas poslední synchronizace se serverem
 
+        // Konstruktor třídy pro inicializaci služeb
         public RaceDataService(HttpClient httpClient, RunnerDatabaseService runnerDatabase)
         {
             _httpClient = httpClient;
             _runnerDatabase = runnerDatabase;
         }
+        /// <summary>
+        /// Asynchronní metoda pro přidání nového závodu na server
+        /// </summary>
         public async Task<int?> AddRaceAsync(string raceName, DateTime raceStart)
         {
             try
@@ -28,22 +40,25 @@ namespace StartCheckerApp
                 if (response.IsSuccessStatusCode)
                 {
                     string responseJson = await response.Content.ReadAsStringAsync();
-                    var result = JsonSerializer.Deserialize<Dictionary<string, object>>(responseJson);
+                    using var document = JsonDocument.Parse(responseJson);
+                    var root = document.RootElement;
 
-                    if (result != null && result.TryGetValue("raceId", out var raceIdObj))
+                    if (root.TryGetProperty("raceId", out var raceIdElement))
                     {
-                        return Convert.ToInt32(raceIdObj);
+                        return raceIdElement.GetInt32();  // Vrátí ID nového závodu
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"AddRaceAsync exception: {ex.Message}");
+                Console.WriteLine($"AddRaceAsync exception: {ex.Message}");  // Logování chyby
             }
 
-            return null;
+            return null;  // Pokud došlo k chybě, vrací null
         }
-
+        /// <summary>
+        /// Asynchronní metoda pro nahrání startovní listiny na server
+        /// </summary>
         public async Task<bool> UploadStartlistAsync(int raceId, FileResult file)
         {
             try
@@ -59,34 +74,47 @@ namespace StartCheckerApp
 
                 var response = await _httpClient.PostAsync("upload-startlist", content);
 
-                return response.IsSuccessStatusCode;
+                return response.IsSuccessStatusCode;  // Vrací true, pokud server odpověděl úspěšně
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"UploadStartlistAsync exception: {ex.Message}");
-                return false;
+                Console.WriteLine($"UploadStartlistAsync exception: {ex.Message}");  // Logování chyby
+                return false;  // Pokud došlo k chybě, vrací false
             }
         }
 
-
+        /// <summary>
+        /// Nastaví závod a jeho startovní listinu do služby
+        /// </summary>
         public void SetRace(int raceId, List<Runner> runners)
         {
             RaceId = raceId;
             Runners = runners;
         }
-        public void SetRunners(List<Runner> runners) //TODO OBSOLETE?
+
+        /// <summary>
+        /// Nastaví seznam závodníků (pokud není použitý SetRace)
+        /// </summary>
+        public void SetRunners(List<Runner> runners)
         {
             Runners = runners;
         }
+
+        /// <summary>
+        /// Aktualizuje závodníka v seznamu
+        /// </summary>
         public void UpdateRunner(Runner updatedRunner)
         {
             int index = Runners.FindIndex(r => r.ID == updatedRunner.ID);
             if (index >= 0)
             {
-                Runners[index] = updatedRunner;
+                Runners[index] = updatedRunner;  // Aktualizuje závodníka na základě ID
             }
         }
 
+        /// <summary>
+        /// Asynchronní metoda pro přidání závodníka na server
+        /// </summary>
         public async Task<int> AddRunnerToServer(Runner runner)
         {
             try
@@ -103,19 +131,22 @@ namespace StartCheckerApp
 
                     if (serverResponse != null && serverResponse.ContainsKey("runnerId"))
                     {
-                        runner.ID = Convert.ToInt32(serverResponse["runnerId"]); // Nastavíme nově vytvořené ID ze serveru
-                        return 201; // HTTP Created
+                        runner.ID = Convert.ToInt32(serverResponse["runnerId"]);  // Nastaví nově vytvořené ID ze serveru
+                        return 201;  // HTTP Created
                     }
                 }
 
-                return (int)response.StatusCode;
+                return (int)response.StatusCode;  // Pokud odpověď není úspěšná, vrátí HTTP status code
             }
             catch
             {
-                return 500; // Interní chyba serveru
+                return 500;  // Interní chyba serveru
             }
         }
 
+        /// <summary>
+        /// Asynchronní metoda pro aktualizaci závodníka na serveru
+        /// </summary>
         public async Task<int> UpdateRunnerOnServer(Runner runner)
         {
             try
@@ -124,39 +155,45 @@ namespace StartCheckerApp
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await _httpClient.PatchAsync("update-runner", content);
-                return (int)response.StatusCode;
+                return (int)response.StatusCode;  // Vrátí status kód odpovědi
             }
             catch
             {
-                return 500; // Interní chyba serveru
+                return 500;  // Interní chyba serveru
             }
         }
 
+        /// <summary>
+        /// Ukládá startovní listinu do SQLite databáze
+        /// </summary>
         public async Task SaveStartListToDatabase(int raceId, List<Runner> runners)
         {
-            await _runnerDatabase.InitializeAsync(); // Zajistí vytvoření tabulky, pokud neexistuje
+            await _runnerDatabase.InitializeAsync();  // Zajistí vytvoření tabulky, pokud neexistuje
 
             foreach (var runner in runners)
             {
-                runner.LastUpdatedAt = DateTime.UtcNow; // Nastavíme timestamp změny
+                runner.LastUpdatedAt = DateTime.UtcNow;  // Nastavíme timestamp změny
                 var existingRunner = await _runnerDatabase.GetRunnerByIdAsync(runner.ID);
 
                 if (existingRunner != null)
                 {
-                    await _runnerDatabase.UpdateRunnerAsync(runner); // Aktualizujeme existujícího závodníka
+                    await _runnerDatabase.UpdateRunnerAsync(runner);  // Aktualizujeme existujícího závodníka
                 }
                 else
                 {
-                    await _runnerDatabase.AddRunnerAsync(runner); // Přidáme nového závodníka
+                    await _runnerDatabase.AddRunnerAsync(runner);  // Přidáme nového závodníka
                 }
             }
 
             await _runnerDatabase.GetRunnersOrderedByStartMinuteAsync();
             await _runnerDatabase.CreateIndexOnStartMinuteAsync();
 
-            LastSyncTime = DateTime.UtcNow; // Aktualizace času poslední synchronizace
+            LastSyncTime = DateTime.UtcNow;  // Aktualizace času poslední synchronizace
         }
 
+        /// <summary>
+        /// Asynchronní metoda pro synchronizaci závodníků se serverem
+        /// </summary>
         public async Task SyncRunnersWithServer()
         {
             bool isServerAvailable = await CheckServerAvailability();
@@ -214,7 +251,9 @@ namespace StartCheckerApp
             await Application.Current.MainPage.DisplayAlert("Synchronizace", "Všechny změny byly úspěšně synchronizovány.", "OK");
         }
 
-
+        /// <summary>
+        /// Asynchronní metoda pro získání změn ze serveru
+        /// </summary>
         public async Task<List<Runner>> FetchUpdatesFromServer(DateTime lastSyncTime)
         {
             try
@@ -246,6 +285,9 @@ namespace StartCheckerApp
             }
         }
 
+        /// <summary>
+        /// Kontrola dostupnosti serveru
+        /// </summary>
         public async Task<bool> CheckServerAvailability()
         {
             try
@@ -259,6 +301,5 @@ namespace StartCheckerApp
                 return false;
             }
         }
-
     }
 }

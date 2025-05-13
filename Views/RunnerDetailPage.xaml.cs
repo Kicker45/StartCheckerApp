@@ -1,3 +1,9 @@
+//------------------------------------------------------------------------------
+// Název souboru: RunnerDetailPage.xaml.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje obsluhu stránky pro detail závodníka.
+// Datum vytvoøení: 1.4.2025
+//------------------------------------------------------------------------------
 using CommunityToolkit.Mvvm.Messaging;
 using StartCheckerApp.Messages;
 using StartCheckerApp.Models;
@@ -15,7 +21,6 @@ public partial class RunnerDetailPage : ContentPage
     private const string DateFormat = "dd.MM.yyyy";
     private const string TimeFormat = "HH:mm:ss";
 
-
     public RunnerDetailPage(Runner runner, HttpClient httpClient, RaceDataService raceDataService, RunnerDatabaseService runnerDatabase)
     {
         InitializeComponent();
@@ -26,6 +31,7 @@ public partial class RunnerDetailPage : ContentPage
 
         _isNewRunner = _runner.ID == 0;
 
+        // Inicializace polí s daty závodníka
         FirstNameEntry.Text = _runner.FirstName;
         SurnameEntry.Text = _runner.Surname;
         CategoryEntry.Text = _runner.Category;
@@ -39,6 +45,9 @@ public partial class RunnerDetailPage : ContentPage
         ConfigureEditability();
     }
 
+    /// <summary>
+    /// Nastaví, které pole mohou být editovatelné na základì toho, zda se jedná o nového závodníka.
+    /// </summary>
     private void ConfigureEditability()
     {
         bool readonlyFields = !_isNewRunner;
@@ -48,12 +57,15 @@ public partial class RunnerDetailPage : ContentPage
         CategoryEntry.IsReadOnly = readonlyFields;
         RegistrationNumberEntry.IsReadOnly = readonlyFields;
 
-        // Umožnìno vždy:
+        // Pole, která jsou vždy povolena k úpravì
         SINumberEntry.IsReadOnly = false;
         StartDatePicker.IsEnabled = true;
         StartTimePicker.IsEnabled = true;
     }
 
+    /// <summary>
+    /// Uloží zmìny provedené na stránce a aktualizuje databázi.
+    /// </summary>
     private async void OnSaveClicked(object sender, EventArgs e)
     {
         _runner.RegistrationNumber = RegistrationNumberEntry.Text;
@@ -85,6 +97,9 @@ public partial class RunnerDetailPage : ContentPage
         await Navigation.PopAsync();
     }
 
+    /// <summary>
+    /// Nastaví stav závodníka na DNS (Did Not Start) a aktualizuje databázi.
+    /// </summary>
     private async void OnDNSClicked(object sender, EventArgs e)
     {
         _runner.DNS = true;
@@ -99,9 +114,11 @@ public partial class RunnerDetailPage : ContentPage
         await Navigation.PopAsync();
     }
 
+    /// <summary>
+    /// Zruší zmìny a vrátí uživatele na pøedchozí stránku.
+    /// </summary>
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         await Navigation.PopAsync();
     }
-
 }

@@ -1,4 +1,10 @@
-﻿using CommunityToolkit.Maui;
+﻿//------------------------------------------------------------------------------
+// Název souboru: MauiProgram.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje konfiguraci a inicializaci MAUI aplikace.
+// Datum vytvoření: 1.2.2025
+//------------------------------------------------------------------------------
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using SQLite;
 using StartCheckerApp.Services;

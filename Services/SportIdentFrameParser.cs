@@ -1,4 +1,11 @@
-﻿namespace StartCheckerApp.Services
+﻿//------------------------------------------------------------------------------
+// Název souboru: SportIdentFrameParser.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje logiku pro parsing dat z externího usb zařízení - Nepovedlo ze zprovoznit.
+// Datum vytvoření: 1.4.2025
+//------------------------------------------------------------------------------
+
+namespace StartCheckerApp.Services
 {
     public enum SiCommand : byte
     {

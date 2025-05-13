@@ -1,4 +1,10 @@
-﻿using System.Globalization;
+﻿//------------------------------------------------------------------------------
+// Název souboru: StatusToColorConverter.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje logiku pro změnu barev závodníků ve startovní listině podle jejich statusu.
+// Datum vytvoření: 1.4.2025
+//------------------------------------------------------------------------------
+using System.Globalization;
 
 namespace StartCheckerApp.Services
 {

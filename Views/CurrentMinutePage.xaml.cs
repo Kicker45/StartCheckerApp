@@ -1,3 +1,10 @@
+//------------------------------------------------------------------------------
+// Název souboru: CurrentMinutePage.xaml.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje logiku pro stránku zobrazující aktuální startovní minutu.
+// Datum vytvoøení: 1.4.2025
+//------------------------------------------------------------------------------
+
 using CommunityToolkit.Mvvm.Messaging;
 using StartCheckerApp.Messages;
 using StartCheckerApp.Models;
@@ -12,6 +19,7 @@ namespace StartCheckerApp.Views
         private ObservableCollection<RunnerGroup> _allGroupedRunners = new();
         private int _currentMinuteIndex = 0;
         private bool _isRunning = true;
+        private int _timeOffset = 0;
 
         protected override Label TimeLabel => TimeLabelControl;
         protected override CollectionView RunnersCollectionView => RunnersList;
@@ -21,6 +29,7 @@ namespace StartCheckerApp.Views
         {
             InitializeComponent();
             LoadGroupedRunners();
+            _timeOffset = Preferences.Get("TimeOffset", 0); // Naètení posunu startovního èasu podle koridoru
             UpdateTimeLoop();
 
             // Registrace zprávy pouze jednou
@@ -70,36 +79,50 @@ namespace StartCheckerApp.Views
             });
         }
 
+        /// <summary>
+        /// Aktualizuje èas na stránce v pravidelných intervalech.
+        /// </summary>
         private async void UpdateTimeLoop()
         {
             while (_isRunning)
             {
-                TimeLabelControl.Text = DateTime.Now.ToString("HH:mm:ss");
+                // Poèítání aktuálního èasu s posunem zadaným v nastavení
+                var adjustedTime = DateTime.Now.AddMinutes(_timeOffset);
+                TimeLabelControl.Text = adjustedTime.ToString("HH:mm:ss");
                 await Task.Delay(500);
             }
         }
 
+        /// <summary>
+        /// Zpracuje událost pøi opuštìní stránky.
+        /// </summary>
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
             _isRunning = false;
             WeakReferenceMessenger.Default.Unregister<RunnerUpdatedMessage>(this);
         }
+
+        /// <summary>
+        /// Zpracuje událost pøi návratu na stránku.
+        /// </summary>
         protected override void OnNavigatedTo(NavigatedToEventArgs args)
         {
             base.OnNavigatedTo(args);
             _isRunning = true;
             UpdateTimeLoop();
-
         }
 
+        /// <summary>
+        /// Naète závodníky z databáze a seskupí je podle startovní minuty.
+        /// </summary>
         private async void LoadGroupedRunners()
         {
             var runners = await RunnerDatabase.GetRunnersAsync();
 
             _allGroupedRunners = [.. runners.OrderBy(r => r.StartTime)
-                       .GroupBy(r => r.StartTime.ToLocalTime().ToString("HH:mm"))
-                       .Select(g => new RunnerGroup(g.Key, g.ToList()))];
+                           .GroupBy(r => r.StartTime.ToLocalTime().ToString("HH:mm"))
+                           .Select(g => new RunnerGroup(g.Key, g.ToList()))];
 
             _minuteGroups.Clear();
             foreach (var group in _allGroupedRunners)
@@ -110,12 +133,19 @@ namespace StartCheckerApp.Views
             UpdateToCurrentMinute();
         }
 
+        /// <summary>
+        /// Aktualizuje zobrazení na aktuální startovní minutu.
+        /// </summary>
         private void UpdateToCurrentMinute()
         {
-            var currentMinute = DateTime.Now.ToString("HH:mm");
+            var currentMinute = DateTime.Now.AddMinutes(_timeOffset).ToString("HH:mm");
             SetCurrentMinuteGroup(currentMinute);
         }
 
+        /// <summary>
+        /// Nastaví skupinu závodníkù pro zobrazení podle zadané minuty.
+        /// </summary>
+        /// <param name="minute">Startovní minuta.</param>
         private void SetCurrentMinuteGroup(string minute)
         {
             _currentMinuteIndex = _minuteGroups.IndexOf(minute);
@@ -127,12 +157,15 @@ namespace StartCheckerApp.Views
             if (_allGroupedRunners.Count > _currentMinuteIndex)
             {
                 RunnersList.ItemsSource = new ObservableCollection<RunnerGroup>
-                {
-                    _allGroupedRunners[_currentMinuteIndex]
-                };
+                    {
+                        _allGroupedRunners[_currentMinuteIndex]
+                    };
             }
         }
 
+        /// <summary>
+        /// Zpracuje kliknutí na závodníka v seznamu.
+        /// </summary>
         private async void OnRunnerClicked(object sender, SelectionChangedEventArgs e)
         {
             if (e.CurrentSelection.Count == 0)
@@ -147,6 +180,9 @@ namespace StartCheckerApp.Views
             ((CollectionView)sender).SelectedItem = null;
         }
 
+        /// <summary>
+        /// Otevøe stránku pro úpravu vybraného závodníka.
+        /// </summary>
         private async void OnEditRunnerClicked(object sender, EventArgs e)
         {
             if (sender is Button button && button.BindingContext is Runner selectedRunner)
@@ -155,6 +191,9 @@ namespace StartCheckerApp.Views
             }
         }
 
+        /// <summary>
+        /// Pøidá nového závodníka s prázdnými hodnotami a otevøe stránku pro jeho úpravu.
+        /// </summary>
         private async void OnAddRunnerClicked(object sender, EventArgs e)
         {
             var newRunner = new Runner
@@ -174,6 +213,9 @@ namespace StartCheckerApp.Views
             await Navigation.PushAsync(new RunnerDetailPage(newRunner, _httpClient, _raceDataService, _runnerDatabase));
         }
 
+        /// <summary>
+        /// Synchronizuje data se serverem a aktualizuje zobrazení.
+        /// </summary>
         private async void OnSyncClicked(object sender, EventArgs e)
         {
             LoadingIndicator.IsVisible = true;
@@ -187,6 +229,9 @@ namespace StartCheckerApp.Views
             UpdateToCurrentMinute();
         }
 
+        /// <summary>
+        /// Pøepne na pøedchozí startovní minutu.
+        /// </summary>
         private void OnPreviousMinuteClicked(object sender, EventArgs e)
         {
             if (_currentMinuteIndex > 0)
@@ -196,6 +241,9 @@ namespace StartCheckerApp.Views
             }
         }
 
+        /// <summary>
+        /// Pøepne na následující startovní minutu.
+        /// </summary>
         private void OnNextMinuteClicked(object sender, EventArgs e)
         {
             if (_currentMinuteIndex < _minuteGroups.Count - 1)

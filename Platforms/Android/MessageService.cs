@@ -8,6 +8,6 @@ public class MessageService : IMessageService
 {
     public async Task ShowMessageAsync(string message)
     {
-        await Toast.Make(message, ToastDuration.Short).Show();
+        await Toast.Make(message, ToastDuration.Long).Show();
     }
 }

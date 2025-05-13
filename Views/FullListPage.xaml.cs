@@ -1,3 +1,10 @@
+//------------------------------------------------------------------------------
+// Název souboru: FullListPage.xaml.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje logiku pro stránku zobrazující kompletní seznam závodníkù.
+// Datum vytvoøení: 1.4.2025
+//------------------------------------------------------------------------------
+
 using CommunityToolkit.Mvvm.Messaging;
 using StartCheckerApp.Messages;
 using StartCheckerApp.Models;
@@ -9,6 +16,7 @@ namespace StartCheckerApp.Views
     public partial class FullListPage : BaseRunnersPage
     {
         private bool _isRunning = true;
+        private int _timeOffset = 0;
 
         protected override Label TimeLabel => TimeLabelControl;
         protected override CollectionView RunnersCollectionView => RunnersList;
@@ -17,7 +25,8 @@ namespace StartCheckerApp.Views
            : base(raceDataService, httpClient, runnerDatabase)
         {
             InitializeComponent();
-            _ = LoadAllRunnersAsync(); // Fix for CS4014 and VSTHRD110: Explicitly discard the task to indicate intentional non-awaiting.  
+            _timeOffset = Preferences.Get("TimeOffset", 0); // Naètení posunu startovního èasu podle koridoru
+            _ = LoadAllRunnersAsync(); // Explicitnì ignorujeme úlohu, aby nedošlo k varování
             UpdateTimeLoop();
 
             // Registrace zprávy – pouze jednou v konstruktoru  
@@ -43,7 +52,7 @@ namespace StartCheckerApp.Views
                         runner.StartPassage = updated.StartPassage;
                         runner.LastUpdatedAt = updated.LastUpdatedAt;
 
-                        runner.OnPropertyChanged(null); // obnoví zobrazení  
+                        runner.OnPropertyChanged(null); // Obnoví zobrazení  
                         return;
                     }
                 }
@@ -63,15 +72,23 @@ namespace StartCheckerApp.Views
             });
         }
 
+        /// <summary>
+        /// Aktualizuje èas na stránce v pravidelných intervalech.
+        /// </summary>
         private async void UpdateTimeLoop()
         {
             while (_isRunning)
             {
-                TimeLabelControl.Text = DateTime.Now.ToString("HH:mm:ss");
+                // Poèítání aktuálního èasu s posunem zadaným v nastavení
+                var adjustedTime = DateTime.Now.AddMinutes(_timeOffset);
+                TimeLabelControl.Text = adjustedTime.ToString("HH:mm:ss");
                 await Task.Delay(500);
             }
         }
 
+        /// <summary>
+        /// Zpracuje událost pøi opuštìní stránky.
+        /// </summary>
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
@@ -79,6 +96,9 @@ namespace StartCheckerApp.Views
             WeakReferenceMessenger.Default.Unregister<RunnerUpdatedMessage>(this);
         }
 
+        /// <summary>
+        /// Zpracuje událost pøi návratu na stránku.
+        /// </summary>
         protected override void OnNavigatedTo(NavigatedToEventArgs args)
         {
             base.OnNavigatedTo(args);
@@ -87,6 +107,9 @@ namespace StartCheckerApp.Views
             _ = LoadAllRunnersAsync();
         }
 
+        /// <summary>
+        /// Zpracuje kliknutí na závodníka v seznamu.
+        /// </summary>
         private async void OnRunnerClicked(object sender, SelectionChangedEventArgs e)
         {
             if (e.CurrentSelection.Count == 0)
@@ -101,6 +124,9 @@ namespace StartCheckerApp.Views
             ((CollectionView)sender).SelectedItem = null;
         }
 
+        /// <summary>
+        /// Otevøe stránku pro úpravu vybraného závodníka.
+        /// </summary>
         private async void OnEditRunnerClicked(object sender, EventArgs e)
         {
             if (sender is Button button && button.BindingContext is Runner selectedRunner)
@@ -109,6 +135,9 @@ namespace StartCheckerApp.Views
             }
         }
 
+        /// <summary>
+        /// Pøidá nového závodníka a otevøe stránku pro jeho úpravu.
+        /// </summary>
         private async void OnAddRunnerClicked(object sender, EventArgs e)
         {
             var newRunner = new Runner
@@ -128,6 +157,9 @@ namespace StartCheckerApp.Views
             await Navigation.PushAsync(new RunnerDetailPage(newRunner, _httpClient, _raceDataService, _runnerDatabase));
         }
 
+        /// <summary>
+        /// Synchronizuje data se serverem a aktualizuje zobrazení.
+        /// </summary>
         private async void OnSyncClicked(object sender, EventArgs e)
         {
             LoadingIndicator.IsVisible = true;
@@ -139,15 +171,12 @@ namespace StartCheckerApp.Views
             LoadingIndicator.IsVisible = false;
         }
 
+        /// <summary>
+        /// Zpracuje zmìnu textu ve vyhledávacím poli a filtruje seznam závodníkù.
+        /// </summary>
         private async void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
             string query = e.NewTextValue?.ToLower().Trim();
-
-            //if (string.IsNullOrEmpty(query))
-            //{
-            //    await LoadAllRunnersAsync();
-            //    return;
-            //}
 
             var runners = await _runnerDatabase.GetRunnersAsync();
 
@@ -171,6 +200,9 @@ namespace StartCheckerApp.Views
             RunnersList.ItemsSource = new ObservableCollection<RunnerGroup>(grouped);
         }
 
+        /// <summary>
+        /// Vymaže text ve vyhledávacím poli a obnoví seznam závodníkù.
+        /// </summary>
         private void OnClearSearchClicked(object sender, EventArgs e)
         {
             SearchEntry.Text = string.Empty;

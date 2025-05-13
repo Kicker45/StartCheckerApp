@@ -1,4 +1,11 @@
-﻿using SQLite;
+﻿//------------------------------------------------------------------------------
+// Název souboru: App.xaml.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje inicializaci hlavních komponent.
+// Datum vytvoření: 1.4.2025
+//------------------------------------------------------------------------------
+
+using SQLite;
 using StartCheckerApp.Models;
 using StartCheckerApp.Views;
 
@@ -11,7 +18,7 @@ namespace StartCheckerApp
         public App(MainPage mainPage, SQLiteAsyncConnection db)
         {
             InitializeComponent();
-            App.Current.UserAppTheme = AppTheme.Light; // ⬅️ Nutné pro globální světlé zobrazení
+            App.Current.UserAppTheme = AppTheme.Light; // ⬅️ Nutné pro globální světlé zobrazení pro lepší čitelnost
             MainPage = new NavigationPage(mainPage);
             _db = db;
         }

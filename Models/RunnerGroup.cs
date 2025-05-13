@@ -1,4 +1,11 @@
-﻿using StartCheckerApp.Models;
+﻿//------------------------------------------------------------------------------
+// Název souboru: RunnerGroup.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje definici modelu pro skupinu závodníku pro zobrazení v UI po startovních minutách.
+// Datum vytvoření: 1.4.2025
+//------------------------------------------------------------------------------
+
+using StartCheckerApp.Models;
 using System.Collections.ObjectModel;
 
 public class RunnerGroup : ObservableCollection<Runner>

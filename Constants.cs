@@ -1,29 +1,39 @@
-﻿using SQLite;
+﻿//------------------------------------------------------------------------------
+// Název souboru: Constants.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje nastavení hodnot konstant pro celý projekt.
+// Datum vytvoření: 1.2.2025
+//------------------------------------------------------------------------------
+
+using SQLite;
 
 namespace StartCheckerApp
 {
     public static class Constants
     {
-        // URL of REST service
-        //public static string RestUrl = "https://dotnetmauitodorest.azurewebsites.net/api/todoitems/{0}";
+        // URL REST služby (Android nepoužívá localhost)
+        // Použijte http pro lokální nasazení. Pro produkci změňte na https.
+        public static string URL = "35.159.141.232"; // AWS adresa, mění se při každém nasazení kontejneru
 
-        // URL of REST service (Android does not use localhost)
-        // Use http cleartext for local deployment. Change to https for production
-        //public static string URL = DeviceInfo.Platform == DevicePlatform.Android ? "10.0.2.2" : "localhost";
-        public static string URL = "35.159.141.232"; //AWS task url, changes with every container deployment
-        public static string Scheme = "http"; // run local server as http
-        public static string Port = "8080"; //5034 for http; 8080 for AWS docker
+        // Schéma URL (http nebo https)
+        public static string Scheme = "http"; // Používá se http pro lokální server
+
+        // Port REST služby
+        public static string Port = "8080"; // 5034 pro http; 8080 pro AWS docker
+
+        // Kompletní URL REST služby
         public static string RestUrl = $"{Scheme}://{URL}:{Port}/api/StartList/";
 
-
-        //Local SQLite database 
+        // Název lokální SQLite databáze
         public const string DatabaseFilename = "runners.db3";
 
+        // Nastavení SQLite databáze
         public const SQLiteOpenFlags Flags =
-            SQLiteOpenFlags.ReadWrite |    // Otevřít DB v režimu čtení/zápisu
-            SQLiteOpenFlags.Create |       // Vytvořit DB, pokud neexistuje
+            SQLiteOpenFlags.ReadWrite |    // Otevřít databázi v režimu čtení/zápisu
+            SQLiteOpenFlags.Create |       // Vytvořit databázi, pokud neexistuje
             SQLiteOpenFlags.SharedCache;   // Povolit sdílenou mezipaměť pro vlákna
 
+        // Cesta k SQLite databázi
         public static string DatabasePath =>
             Path.Combine(FileSystem.AppDataDirectory, DatabaseFilename);
     }

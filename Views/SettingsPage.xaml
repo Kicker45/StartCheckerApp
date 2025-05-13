@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
+<!--
+Název souboru: SettingsPage.xaml
+Autor: Jan Nechanický
+Popis: Tento soubor definuje stránku pro zobrazení nastavení aplikace.
+Datum vytvoření: 1.4.2025
+-->
+    <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="StartCheckerApp.Views.SettingsPage"
@@ -7,6 +13,9 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="12">
+            <Label Text="Časový posun (délka koridoru)" FontSize="20" />
+            <Entry x:Name="TimeOffsetEntry" Keyboard="Numeric" Placeholder="Zadejte počet minut k posunu"/>
+            <Button Text="Save" Clicked="OnSaveTimeOffsetClickedAsync"/>
 
             <Label Text="Název závodu:" FontSize="20"/>
             <Entry x:Name="RaceNameEntry" Placeholder="Zadejte název závodu" FontSize="20"/>

@@ -1,4 +1,10 @@
-﻿namespace StartCheckerApp.Services
+﻿//------------------------------------------------------------------------------
+// Název souboru: UsbCommunicationService.cs
+// Autor: Jan Nechanický
+// Popis: Tento soubor obsahuje obsluhu připojeného USB zařízení - nepovedlo se zprovoznit.
+// Datum vytvoření: 1.4.2025
+//------------------------------------------------------------------------------
+namespace StartCheckerApp.Services
 {
     public class UsbCommunicationService
     {
