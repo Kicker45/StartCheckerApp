@@ -3,7 +3,7 @@
 **Mobilní aplikace pro správu startovních listin a sledování závodníků v orientačním běhu**  
 Autor: Jan Nechanický  
 Vedoucí: doc. Ing. Vítězslav Beran, Ph.D.  
-Datum vytvoření: 1. 2. 2025  
+Vytvoření: 2025  
 
 ---
 # Postup pro otevření a spuštění řešení
